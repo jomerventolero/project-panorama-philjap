@@ -1,5 +1,5 @@
 import React from 'react'
-import RegisterForm from '../components/RegisterForm'
+import RegistrationForm from '../components/RegistrationForm'
 import { motion } from 'framer-motion'
 
 import headmaster from "../assets/HeadMaster.png"
@@ -24,7 +24,7 @@ const RegisterPage = () => {
             alt="Streamline your reservations and elevate your professional profile with ease."
             className="w-full -mt-30"
             />
-            <RegisterForm />
+            <RegistrationForm />
         </motion.div>
         <motion.div 
             initial={{ x: 900 }}
