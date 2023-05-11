@@ -5,3 +5,22 @@
 .inverted-icon {
     filter: invert(1);
 }
+
+#panorama-container {
+    position: relative;
+    width: 1440px;
+    height: 650px;
+    margin: 0 auto;
+    overflow: hidden;
+    cursor: move;
+    /* fallback if grab cursor is unsupported */
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+}
+
+#panorama-container:active {
+    cursor: grabbing;
+    cursor: -moz-grabbing;
+    cursor: -webkit-grabbing;
+}

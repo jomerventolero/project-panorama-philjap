@@ -4,7 +4,7 @@ const admin = require("firebase-admin")
 const serviceAccount = require("./firebase-config/philjaps-firebase-adminsdk-asmoe-0b7dffd0ca.json")
 
 const app = express()
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3002;
 
 
 admin.initializeApp({
