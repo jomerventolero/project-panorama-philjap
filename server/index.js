@@ -8,7 +8,7 @@ const serviceAccount = require("./firebase-config/philjaps-firebase-adminsdk-asm
 
 
 const app = express()
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3002;
 
 
 admin.initializeApp({
@@ -16,6 +16,7 @@ admin.initializeApp({
 });
 
 const auth = admin.auth();
+const db = admin.firestore();
 
 /* `app.use(cors())` enables Cross-Origin Resource Sharing (CORS) for the Express server, allowing it
 to receive requests from other domains. `app.use(express.json())` is middleware that parses incoming
@@ -147,6 +148,12 @@ app.post('/signup', async (req, res) => {
 });
 
 
+/* This code defines an endpoint for retrieving a user's first name from Firestore. When a GET request
+is made to the '/user' endpoint, the function retrieves the ID token from the request headers. It
+then verifies the authenticity of the token using the Firebase Admin SDK and retrieves the user's
+first name from Firestore using the decoded token's UID. Finally, it sends a response to the client
+with the user's first name. If there is an error during the process, it sends an error response with
+the error message. */
 app.get('/user', async (req, res) => {
   const idToken = req.headers.authorization;
 
@@ -174,8 +181,7 @@ information (first name, last name, birthday, and isAdmin status) in Firestore a
 to the client with a success message and the user's unique ID (UID). If there is an error during the
 process, it sends an error response with the error message. */
 app.post('/register', async (req, res) => {
-  const { firstName, lastName, birthday, email, password, isAdmin } = req.body;
-
+  const { firstName, lastName, bday, email, password, isAdmin } = req.body;
   try {
     // Create a new user
     const userRecord = await auth.createUser({
@@ -187,7 +193,7 @@ app.post('/register', async (req, res) => {
     await db.collection('users').doc(userRecord.uid).set({
       firstName: firstName,
       lastName: lastName,
-      birthday: birthday,
+      birthday: bday,
       isAdmin: isAdmin,
     });
 

@@ -8,7 +8,7 @@ const RegistrationForm = () => {
   const [error, setError] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [bday, setBday] = useState("");
+  const [bday, setBday] = useState(new Date().toISOString().slice(0,10));
   const [isAdmin, setIsAdmin] = useState(false);
 
   const handleRegister = async (e) => {
@@ -18,7 +18,7 @@ const RegistrationForm = () => {
       return;
     }
     try {
-      axios.post('http://localhost:3000/register', { email, password, firstName, lastName, bday, isAdmin })
+      axios.post('http://localhost:3002/register', { email, password, firstName, lastName, bday, isAdmin })
       .then(response => {
         console.log(response.data);
         window.location.href = '/';
@@ -124,7 +124,7 @@ const RegistrationForm = () => {
           <label className="block mb-2 font-bold text-gray-700" htmlFor="confirmPassword">
             Confirm Password
           </label>
-          <input type="checkbox" id="isAdmin" name="isAdmin" value={isAdmin} onChange={(e) => setIsAdmin(e.target.value)}/>
+          <input type="checkbox" id="isAdmin" name="isAdmin" checked={isAdmin} onChange={(e) => setIsAdmin(e.target.checked)}/>
           <label className="px-2 text-white">Engineer Account</label>          
         </div>
         <div className="flex items-center justify-between">
