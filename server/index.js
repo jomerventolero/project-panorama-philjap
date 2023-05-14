@@ -1,16 +1,21 @@
-/* This code is importing necessary modules and setting up a server using the Express framework. */
+/* This code is importing necessary
+   modules and setting up a server 
+   using the Express framework. */
 const express = require("express");
 const cors = require("cors")
 const admin = require("firebase-admin")
 const serviceAccount = require("./firebase-config/philjaps-firebase-adminsdk-asmoe-0b7dffd0ca.json")
 
+
 const app = express()
-const port = process.env.PORT || 3002;
+const port = process.env.PORT || 3000;
 
 
 admin.initializeApp({
 	credential: admin.credential.cert(serviceAccount),
 });
+
+const auth = admin.auth();
 
 /* `app.use(cors())` enables Cross-Origin Resource Sharing (CORS) for the Express server, allowing it
 to receive requests from other domains. `app.use(express.json())` is middleware that parses incoming
@@ -55,6 +60,42 @@ const verifyIdToken = async (req, res, next) => {
     res.status(403).json({ error: 'Invalid token' });
   }
 };
+
+
+/* This code defines an endpoint for retrieving a user's conversation history. When a GET request is
+made to the '/user/:userId/conversations' endpoint, the function retrieves the user ID from the
+request parameters. It then queries the Firestore database for messages that were either sent by or
+received by the user, combines them, and sorts them by timestamp. Finally, it sends a response to
+the client with the conversation history in the form of an array of message objects. If there is an
+error during the process, it sends an error response with the error message. */
+app.get('/user/:userId/conversations', async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    // Get messages sent by or received by the user
+    const sentMessagesSnapshot = await db.collection('messages')
+      .where('from', '==', userId)
+      .orderBy('timestamp', 'desc')
+      .get();
+
+    const receivedMessagesSnapshot = await db.collection('messages')
+      .where('to', '==', userId)
+      .orderBy('timestamp', 'desc')
+      .get();
+
+    // Combine the sent and received messages and sort them by timestamp
+    const messages = [
+      ...sentMessagesSnapshot.docs.map(doc => doc.data()),
+      ...receivedMessagesSnapshot.docs.map(doc => doc.data())
+    ].sort((a, b) => b.timestamp - a.timestamp);
+
+    res.send({ messages });
+  } catch (error) {
+    console.error('Error getting conversation history:', error);
+    res.status(500).send({ message: 'Error getting conversation history' });
+  }
+});
+
 
 /**
  * This function validates a Firebase ID token in a request header and sets the decoded token as a
@@ -105,6 +146,59 @@ app.post('/signup', async (req, res) => {
   }
 });
 
+
+app.get('/user', async (req, res) => {
+  const idToken = req.headers.authorization;
+
+  try {
+    // Verify the ID token
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+
+    // Get the user's first name from Firestore
+    const userSnapshot = await db.collection('users').doc(decodedToken.uid).get();
+    const userData = userSnapshot.data();
+
+    res.send({ firstName: userData.firstName });
+  } catch (error) {
+    console.error('Error getting user data:', error);
+    res.status(500).send({ message: 'Error getting user data' });
+  }
+});
+
+
+/* This code defines an endpoint for user registration. When a POST request is made to the '/register'
+endpoint, the function retrieves the user's first name, last name, birthday, email, password, and
+isAdmin status from the request body. It then uses the Firebase Admin SDK to create a new user with
+the provided email and password. If the user is created successfully, it saves the user's profile
+information (first name, last name, birthday, and isAdmin status) in Firestore and sends a response
+to the client with a success message and the user's unique ID (UID). If there is an error during the
+process, it sends an error response with the error message. */
+app.post('/register', async (req, res) => {
+  const { firstName, lastName, birthday, email, password, isAdmin } = req.body;
+
+  try {
+    // Create a new user
+    const userRecord = await auth.createUser({
+      email: email,
+      password: password,
+    });
+
+    // Save the user's profile information in Firestore
+    await db.collection('users').doc(userRecord.uid).set({
+      firstName: firstName,
+      lastName: lastName,
+      birthday: birthday,
+      isAdmin: isAdmin,
+    });
+
+    res.send({ message: 'User registered successfully', userId: userRecord.uid });
+  } catch (error) {
+    console.error('Error creating new user:', error);
+    res.status(500).send({ message: 'Error creating new user' });
+  }
+});
+
+
 app.get('/getImage/:imageName', async (req, res) => {
   try {
       const bucket = admin.storage().bucket();
@@ -126,7 +220,8 @@ app.get('/getImage/:imageName', async (req, res) => {
 
 app.get('/test', (req, res) => {
 	res.send("Success!")
-})
+});
+
 
 /* The above code is starting a server and listening on a specified port. When the server starts
 running, it will log a message to the console indicating the port number on which the server is
@@ -134,3 +229,4 @@ running. */
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+

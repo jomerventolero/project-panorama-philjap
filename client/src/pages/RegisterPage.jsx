@@ -10,6 +10,17 @@ const RegisterPage = () => {
 
   return (
     <div className="flex justify-end bg-slate-900">
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: .5 }}
+            transition = {{ 
+                type: "fade",
+                delay: ".5",
+                duration: "4"
+            }}
+            >
+            <img src={headmaster} alt="Headmaster" className="absolute w-[256px] top-5 right-5" />
+        </motion.div>
         <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -18,12 +29,8 @@ const RegisterPage = () => {
                 delay: "1",
                 duration: "4"
             }}
-            className="flex flex-col items-center justify-center pr-[15%]">
-            <img 
-            src={headmaster} 
-            alt="Streamline your reservations and elevate your professional profile with ease."
-            className="w-full -mt-30"
-            />
+            className="flex flex-col items-center justify-center pr-[7%]">
+
             <RegistrationForm />
         </motion.div>
         <motion.div 
