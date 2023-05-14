@@ -1,3 +1,4 @@
+/* This code is importing necessary modules and setting up a server using the Express framework. */
 const express = require("express");
 const cors = require("cors")
 const admin = require("firebase-admin")
@@ -104,6 +105,23 @@ app.post('/signup', async (req, res) => {
   }
 });
 
+app.get('/getImage/:imageName', async (req, res) => {
+  try {
+      const bucket = admin.storage().bucket();
+      const file = bucket.file(req.params.imageName);
+      const url = await file.getSignedUrl({
+          action: 'read',
+          expires: '03-09-2491'
+      });
+
+      // Return the download URL
+      res.send({ url: url[0] });
+
+  } catch (error) {
+      console.error('Error getting download URL', error);
+      res.status(500).send('Error getting download URL');
+  }
+});
 
 
 app.get('/test', (req, res) => {

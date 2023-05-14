@@ -16,7 +16,7 @@ function init() {
 
     // Load the panorama image
     const loader = new THREE.TextureLoader();
-    const texture = loader.load('./img/sample.jpg');
+    const texture = loader.load('./public/img/sample.jpg');
 
     // Set the texture wrapping and flipping options
     texture.wrapS = THREE.RepeatWrapping;

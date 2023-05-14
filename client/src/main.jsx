@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import ReactDOM from 'react-dom/client'
 
 
@@ -10,6 +10,19 @@ import Dashboard from './pages/AdminDashboard'
 
 import './index.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+
+const userAuth = () => {
+  const [user, setUser] = useState(null)
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((authUser) => {
+      setUser(authUser)
+    });
+
+    return () => unsubscribe();
+    }, []);
+  return user;
+}
 
 
 const router = createBrowserRouter([
@@ -27,7 +40,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/dashboard',
-    element: <Dashboard />
+    element: userAuth ? <Dashboard /> : <App />
   },
 
 ])
