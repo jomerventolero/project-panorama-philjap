@@ -1,6 +1,14 @@
-
-
-
+/**
+ * This function sends a message between two users while preventing admin to admin messaging.
+ * @param fromUserId - The ID of the user who is sending the message.
+ * @param toUserId - The `toUserId` parameter is the ID of the user who will receive the message.
+ * @param message - The message parameter is the actual message that is being sent from the fromUserId
+ * to the toUserId. It is a string value.
+ * @returns Nothing is being returned explicitly in this code. However, if the condition `if
+ * (fromIsAdmin && toIsAdmin)` is met, the function will return without sending the message. Otherwise,
+ * if the message is sent successfully, the console will log "Message sent successfully". If there is
+ * an error, the console will log "Error sending message" along with the error message.
+ */
 async function sendMessage(fromUserId, toUserId, message) {
     try {
       const db = firebase.firestore();
