@@ -7,6 +7,8 @@ import ContactUsPage from './pages/ContactUsPage'
 import RegisterPage from './pages/RegisterPage'
 import Dashboard from './pages/AdminDashboard'
 
+import { auth } from './firebase/auth'
+
 
 import './index.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
@@ -15,8 +17,8 @@ const userAuth = () => {
   const [user, setUser] = useState(null)
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((authUser) => {
-      setUser(authUser)
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user)
     });
 
     return () => unsubscribe();
