@@ -4,7 +4,7 @@
 const express = require("express");
 const cors = require("cors")
 const admin = require("firebase-admin")
-const serviceAccount = require("./firebase-config/philjaps-firebase-adminsdk-asmoe-0b7dffd0ca.json")
+const serviceAccount = require("./firebase-config/philjaps-firebase-adminsdk-asmoe-c066ae76b2.json")
 
 
 const app = express()
@@ -17,6 +17,12 @@ admin.initializeApp({
 
 const auth = admin.auth();
 const db = admin.firestore();
+
+const { Storage } = require('@google-cloud/storage');
+
+const storage = new Storage({
+  credentials: serviceAccount,
+});
 
 /* `app.use(cors())` enables Cross-Origin Resource Sharing (CORS) for the Express server, allowing it
 to receive requests from other domains. `app.use(express.json())` is middleware that parses incoming
@@ -131,23 +137,6 @@ const validateFirebaseIdToken = async (req, res, next) => {
 };
 
 
-/* This code defines an endpoint for user signup. When a POST request is made to the '/signup'
-endpoint, the function retrieves the email and password from the request body. It then uses the
-Firebase Admin SDK to create a new user with the provided email and password. If the user is created
-successfully, it sends a response to the client with the user's unique ID (UID). If there is an
-error during the process, it sends an error response with the error message. */
-app.post('/signup', async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    const userRecord = await admin.auth().createUser({ email, password });
-    res.status(201).json({ uid: userRecord.uid });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-
 /* This code defines an endpoint for retrieving a user's first name from Firestore. When a GET request
 is made to the '/user' endpoint, the function retrieves the ID token from the request headers. It
 then verifies the authenticity of the token using the Firebase Admin SDK and retrieves the user's
@@ -177,9 +166,11 @@ app.get('/user', async (req, res) => {
 endpoint, the function retrieves the user's first name, last name, birthday, email, password, and
 isAdmin status from the request body. It then uses the Firebase Admin SDK to create a new user with
 the provided email and password. If the user is created successfully, it saves the user's profile
-information (first name, last name, birthday, and isAdmin status) in Firestore and sends a response
-to the client with a success message and the user's unique ID (UID). If there is an error during the
-process, it sends an error response with the error message. */
+information in Firestore and sends a response to the client with a success message and the user's
+unique ID (UID). If the user is an admin, it creates a dedicated folder for the admin user in
+Firebase Storage, sets custom Firebase Storage rules for the admin folder, and grants admin
+privileges to the user. If there is an error during the process, it sends an error response with the
+error message. */
 app.post('/register', async (req, res) => {
   const { firstName, lastName, bday, email, password, isAdmin } = req.body;
   try {
@@ -197,6 +188,26 @@ app.post('/register', async (req, res) => {
       isAdmin: isAdmin,
     });
 
+    if (isAdmin) {
+      // Create a dedicated folder for the admin user in Firebase Storage
+      const adminFolderRef = storage.ref().child(`admin/${userRecord.uid}`);
+      await adminFolderRef.put({});
+
+      // Set custom Firebase Storage rules for the admin folder
+      await storage.ref('.settings/rules.json').put(JSON.stringify({
+        rules: {
+          rulesVersion: '2',
+          firebaseStoragePath: {
+            '.write': `root.child('admin/${userRecord.uid}').child(newData.path).child('metadata/admin').val() === true`,
+            '.read': `root.child('admin/${userRecord.uid}').child(data.path).child('metadata/admin').val() === true`,
+          }
+        }
+      }));
+
+      // Grant admin privileges to the user
+      await admin.auth().setCustomUserClaims(userRecord.uid, { admin: true });
+    }
+
     res.send({ message: 'User registered successfully', userId: userRecord.uid });
   } catch (error) {
     console.error('Error creating new user:', error);
@@ -205,21 +216,33 @@ app.post('/register', async (req, res) => {
 });
 
 
-app.get('/getImage/:imageName', async (req, res) => {
+
+/* This code defines an endpoint for retrieving a list of panorama images for a specific user. When a
+GET request is made to the '/panorama-images/:userId' endpoint, the function retrieves the user ID
+from the request parameters. It then fetches the list of images for the specified user from Firebase
+Storage using the Firebase Storage SDK. It extracts the relevant information from the image
+metadata, such as the image name and download URL, and sends a response to the client with an array
+of image objects. If there is an error during the process, it sends an error response with the error
+message. */
+app.get('/panorama-images/:userId', async (req, res) => {
+  const { userId } = req.params;
   try {
-      const bucket = admin.storage().bucket();
-      const file = bucket.file(req.params.imageName);
-      const url = await file.getSignedUrl({
-          action: 'read',
-          expires: '03-09-2491'
-      });
+    // Fetch the list of images for the specified user from Firebase Storage
+    const bucketName = 'philjaps.appspot.com/'; // Replace with your storage bucket name
+    const bucket = storage.bucket(bucketName);
+    const folderPath = `users/${userId}`;
+    const [files] = await bucket.getFiles({ prefix: folderPath });
 
-      // Return the download URL
-      res.send({ url: url[0] });
+    // Extract the relevant information from the file metadata
+    const imageList = files.map((file) => ({
+      name: file.name,
+      downloadUrl: `https://storage.googleapis.com/${bucketName}/${file.name}`,
+    }));
 
+    res.send(imageList);
   } catch (error) {
-      console.error('Error getting download URL', error);
-      res.status(500).send('Error getting download URL');
+    console.error('Error fetching panorama images:', error);
+    res.status(500).send({ message: 'Error fetching panorama images' });
   }
 });
 

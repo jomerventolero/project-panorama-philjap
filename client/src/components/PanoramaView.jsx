@@ -11,7 +11,7 @@ function PanoramaViewer() {
     <div>
           <a
           className="font-medium text-white cursor-pointer"
-          href="http://localhost:8000"
+          href="http://localhost:8001"
           >Load Panorama</a>
     </div>
   );
