@@ -27,15 +27,17 @@
    maximum number of files and the maximum file size that can be uploaded. Specifically, it allows
    up to 15 files to be uploaded, with each file having a maximum size of 50 MB. */
    // set multer to store files temporarily on disk
-  const storage = multer.diskStorage({
+  // Set up storage engine
+  let storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, '/tmp/uploads')
+      cb(null, './uploads'); // the path where the uploaded files will be stored. Make sure this directory exists.
     },
     filename: function (req, file, cb) {
-      cb(null, file.fieldname + '-' + Date.now())
-    }
+      cb(null, file.fieldname + '-' + Date.now()); // sets the name of the file that will be saved.
+    },
   });
-  const upload = multer({ storage });
+
+  let upload = multer({ storage: storage });
    
    /* `app.use(cors())` enables Cross-Origin Resource Sharing (CORS) for the Express server, allowing it
    to receive requests from other domains. `app.use(express.json())` is middleware that parses incoming
@@ -80,6 +82,33 @@
        res.status(403).json({ error: 'Invalid token' });
      }
    };
+
+
+
+const checkAuth = (req, res, next) => {
+    if (
+        req.headers.authorization &&
+        req.headers.authorization.startsWith('Bearer ')
+    ) {
+        // Extract the Firebase ID Token
+        const idToken = req.headers.authorization.split('Bearer ')[1];
+
+        admin
+            .auth()
+            .verifyIdToken(idToken)
+            .then((decodedToken) => {
+                req.user = decodedToken;
+                next();
+            })
+            .catch((error) => {
+                console.error('Error while verifying token', error);
+                res.status(403).send('Unauthorized');
+            });
+    } else {
+        res.status(403).send('Unauthorized');
+    }
+};
+
    
    /* This code defines an endpoint for retrieving a user's conversation history. When a GET request is
    made to the '/user/:userId/conversations' endpoint, the function retrieves the user ID from the

@@ -4,7 +4,7 @@ import PanoramaUploader from '../components/PanoramaUploader'
 
 const UploadPage = () => {
   return (
-    <div className="w-screen h-screen bg-slate-700">
+    <div className="w-screen h-full bg-cover bg-slate-700">
         <Navbar />
         <div className="pt-[100px]">
             <PanoramaUploader />

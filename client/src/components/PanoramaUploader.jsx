@@ -27,44 +27,47 @@ const PanoramaUploader = () => {
 
   const handleUpload = async () => {
     setError('');
-  
+
     if (projectName.trim() === '') {
       setError('Please enter a project name.');
       return;
     }
-  
+
     if (views.some(view => view.title.trim() === '' || view.description.trim() === '' || view.image === null)) {
       setError('Please fill in all fields for each view.');
       return;
     }
-  
+
     // Validate image size before upload
     for (const view of views) {
-      if (view.image.size > 5000000) { // 5MB
-        setError('Each image should be smaller than 5MB.');
+      // Check if image is undefined before accessing its size property
+      if (!view.image || view.image.size > 500000000) { // 50MB
+        setError('Each image should be smaller than 50MB and should be uploaded.');
         return;
       }
     }
-  
+
     setLoading(true);
-  
+
     try {
       const formData = new FormData();
       formData.append('projectName', projectName.trim());
       views.forEach((view, index) => {
         formData.append(`titles[${index}]`, view.title.trim());
         formData.append(`descriptions[${index}]`, view.description.trim());
-        formData.append(`images[${index}]`, view.image);
+        if(view.image) { // check if image exists before appending
+          formData.append(`images[${index}]`, view.image);
+        }
       });
-  
+
       // Move axios request to an asynchronous function
       const uploadImage = async () => {
         await axios.post('http://localhost:3002/upload', formData);
       }
-  
+
       // Execute function
       await uploadImage();
-  
+
       setProjectName('');
       setViews([{ title: '', description: '', image: null }]);
     } catch (error) {
@@ -74,6 +77,8 @@ const PanoramaUploader = () => {
       setLoading(false);
     }
   };
+
+  
   
 
   return (
