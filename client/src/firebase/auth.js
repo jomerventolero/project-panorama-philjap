@@ -4,19 +4,19 @@ import 'firebase/compat/auth';
 
 const firebaseConfig = {
 
-    apiKey: "AIzaSyAKUyLmRjZaMHTpgWttqIDZe-s168VnGeM",
+    "apiKey": "AIzaSyAKUyLmRjZaMHTpgWttqIDZe-s168VnGeM",
   
-    authDomain: "philjaps.firebaseapp.com",
+    "authDomain": "philjaps.firebaseapp.com",
   
-    projectId: "philjaps",
+    "projectId": "philjaps",
   
-    storageBucket: "philjaps.appspot.com",
+    "storageBucket": "philjaps.appspot.com",
   
-    messagingSenderId: "594380973782",
+    "messagingSenderId": "594380973782",
   
-    appId: "1:594380973782:web:7f69d38c84b138a3084b77",
+    "appId": "1:594380973782:web:7f69d38c84b138a3084b77",
   
-    measurementId: "G-KCMKNEHBK1"
+    "measurementId": "G-KCMKNEHBK1"
   
   };
   
@@ -26,4 +26,4 @@ const app = firebase.initializeApp(firebaseConfig);
 
 const auth = app.auth();
 
-export { auth, firebaseConfig };
+export { app, auth, firebaseConfig };

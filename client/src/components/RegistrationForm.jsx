@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from 'axios'
+import axios from 'axios';
 
 const RegistrationForm = () => {
   const [email, setEmail] = useState("");
@@ -10,6 +10,7 @@ const RegistrationForm = () => {
   const [lastName, setLastName] = useState("");
   const [bday, setBday] = useState(new Date().toISOString().slice(0,10));
   const [isAdmin, setIsAdmin] = useState(false);
+  const [registering, setRegistering] = useState(false);
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -18,17 +19,15 @@ const RegistrationForm = () => {
       return;
     }
     try {
-      axios.post('http://localhost:3002/register', { email, password, firstName, lastName, bday, isAdmin })
-      .then(response => {
-        console.log(response.data);
-        window.location.href = '/';
-      })
-      .catch(error => {
-        console.log(error);
-      })
+      setRegistering(true); // Set registering to true to display the loading modal
+      await axios.post('http://localhost:3002/register', { email, password, firstName, lastName, bday, isAdmin });
+      alert("Registration successful!");
+      window.location.href = '/';
     } catch (err) {
       console.log(err);
       setError(err.message);
+    } finally {
+      setRegistering(false); // Set registering back to false to hide the loading modal
     }
   };
 
@@ -53,8 +52,8 @@ const RegistrationForm = () => {
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
-        <div className="flex flex-row justify-center gap-2">
-          <div className="mb-4">
+        <div className="flex flex-col sm:flex-row sm:gap-2">
+          <div className="mb-4 sm:w-1/2">
             <label className="block mb-2 font-bold text-gray-700" htmlFor="email">
               First Name
             </label>
@@ -67,7 +66,7 @@ const RegistrationForm = () => {
               onChange={(e) => setFirstName(e.target.value)}
             />
           </div>
-          <div className="mb-4">
+          <div className="mb-4 sm:w-1/2">
             <label className="block mb-2 font-bold text-gray-700" htmlFor="email">
               Last Name
             </label>
@@ -120,20 +119,28 @@ const RegistrationForm = () => {
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
         </div>
-        <div className="mb-6">
-          <label className="block mb-2 font-bold text-gray-700" htmlFor="confirmPassword">
-            Confirm Password
-          </label>
-          <input type="checkbox" id="isAdmin" name="isAdmin" checked={isAdmin} onChange={(e) => setIsAdmin(e.target.checked)}/>
-          <label className="px-2 text-white">Engineer Account</label>          
+        <div className="flex items-center mb-6">
+          <input
+            type="checkbox"
+            id="isAdmin"
+            name="isAdmin"
+            checked={isAdmin}
+            onChange={(e) => setIsAdmin(e.target.checked)}
+          />
+          <label className="px-2 text-white" htmlFor="isAdmin">Engineer Account</label>
         </div>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-2 items-center justify-center">
           <button
             className="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:shadow-outline"
             type="submit"
+            disabled={registering}
           >
-            Register
+            {registering ? "Registering..." : "Register"}
           </button>
+          <span className="text-white">
+            Already have an Account?  
+            <a className="mx-2 hover:text-blue-500 font-medium" href="/login">Login here</a>
+          </span>
         </div>
       </form>
     </div>

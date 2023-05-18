@@ -1,54 +1,28 @@
-import React, { useEffect } from 'react'
-import ReactDOM from 'react-dom/client'
-
-
-import App from './App.jsx'
-import ContactUsPage from './pages/ContactUsPage'
-import RegisterPage from './pages/RegisterPage'
-import Dashboard from './pages/AdminDashboard'
-
-import { auth } from './firebase/auth'
-
-
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
+import ContactUsPage from './pages/ContactUsPage';
+import RegisterPage from './pages/RegisterPage';
+import Dashboard from './pages/AdminDashboard';
+import LoginPage from './pages/LoginPage';
+import UploadPage from './pages/UploadPage';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import ProtectedRoute from './components/ProtectedRoute';
 import './index.css'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
-const userAuth = () => {
-  const [user, setUser] = useState(null)
+const root = ReactDOM.createRoot(document.getElementById('root'));
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser(user)
-    });
-
-    return () => unsubscribe();
-    }, []);
-  return user;
-}
-
-
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <App/>
-  },
-  {
-    path: '/aboutus',
-    element: <ContactUsPage />
-  },
-  {
-    path: '/register',
-    element: <RegisterPage />
-  },
-  {
-    path: '/dashboard',
-    element: userAuth ? <Dashboard /> : <App />
-  },
-
-])
-
-ReactDOM.createRoot(document.getElementById('root')).render(
+root.render(
   <React.StrictMode>
-    <RouterProvider router={router}/>
-  </React.StrictMode>,
-)
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<App />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/aboutus" element={<ContactUsPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/upload" element={<ProtectedRoute><UploadPage /></ProtectedRoute>} />
+      </Routes>
+    </BrowserRouter>
+  </React.StrictMode>
+);
