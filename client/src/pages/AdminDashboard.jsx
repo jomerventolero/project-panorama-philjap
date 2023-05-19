@@ -7,7 +7,7 @@ const AdminDashboard = () => {
   return (
     <div className="pt-[120px] bg-slate-900">
       <Navbar />
-      <div>
+      <div className="">
         <PanoramaViewer image={src}/>
       </div>
     </div>
