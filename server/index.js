@@ -45,39 +45,6 @@
   request object. This allows the server to handle JSON data sent in the request body. */
   app.use(cors());
   app.use(express.json());   
-
-   
-  /* This code defines an endpoint for retrieving a user's conversation history. When a GET request is
-  made to the '/user/:userId/conversations' endpoint, the function retrieves the user ID from the
-  request parameters. It then queries the Firestore database for messages that were either sent by or
-  received by the user, combines them, and sorts them by timestamp. Finally, it sends a response to
-  the client with the conversation history in the form of an array of message objects. If there is an
-  error during the process, it sends an error response with the error message. */
-  app.get('/user/:userId/conversations', async (req, res) => {
-    const userId = req.params.userId;   
-    try {
-      // Get messages sent by or received by the user
-      const sentMessagesSnapshot = await db
-        .collection('messages')
-        .where('from', '==', userId)
-        .orderBy('timestamp', 'desc')
-        .get();   
-      const receivedMessagesSnapshot = await db
-        .collection('messages')
-        .where('to', '==', userId)
-        .orderBy('timestamp', 'desc')
-        .get();   
-      // Combine the sent and received messages and sort them by timestamp
-      const messages = [
-        ...sentMessagesSnapshot.docs.map((doc) => doc.data()),
-        ...receivedMessagesSnapshot.docs.map((doc) => doc.data()),
-      ].sort((a, b) => b.timestamp - a.timestamp);   
-      res.send({ messages });
-    } catch (error) {
-      console.error('Error getting conversation history:', error);
-      res.status(500).send({ message: 'Error getting conversation history' });
-    }
-  });
    
 
   /**
@@ -119,12 +86,10 @@
   first name from Firestore using the decoded token's UID. Finally, it sends a response to the client
   with the user's first name. If there is an error during the process, it sends an error response with
   the error message. */
-  app.get('/user', async (req, res) => {
+  app.get('/user', validateFirebaseIdToken, async (req, res) => {
     const idToken = req.headers.authorization;   
     try {
-      // Verify the ID token
       const decodedToken = await admin.auth().verifyIdToken(idToken);   
-      // Get the user's first name from Firestore
       const userSnapshot = await db
         .collection('users')
         .doc(decodedToken.uid)
@@ -135,7 +100,7 @@
       console.error('Error getting user data:', error);
       res.status(500).send({ message: 'Error getting user data' });
     }
-  });   
+  });
 
 
   /* This code defines an endpoint for user registration. When a POST request is made to the '/register'
@@ -197,6 +162,7 @@
     const snapshot = await projectsRef.where('userId', '==', userId).get();  
     if (snapshot.empty) {
       res.status(404).send('No project found');
+      console.log('No matching documents.');
     } else {
       let projects = [];
       snapshot.forEach(doc => {
@@ -229,6 +195,7 @@
 
       if (!projectCollections.length) {
         res.status(404).send('No projects found for this user');
+        console.log('No matching documents.');
         return;
       }
 
