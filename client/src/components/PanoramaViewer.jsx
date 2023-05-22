@@ -77,6 +77,7 @@ const PanoramaViewer = ({image}) => {
 
     // Resize the renderer when the window size changes
     const handleResize = () => {
+      // Set the camera aspect ratio and the renderer size to match the window size
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
@@ -84,8 +85,13 @@ const PanoramaViewer = ({image}) => {
 
     window.addEventListener('resize', handleResize);
 
+    // Cleanup function in useEffect
     return () => {
       window.removeEventListener('resize', handleResize);
+      if (containerRef.current) {
+        // Remove the renderer's DOM element from the container
+        containerRef.current.removeChild(renderer.domElement);
+      }
       renderer.dispose();
     };
   }, []);

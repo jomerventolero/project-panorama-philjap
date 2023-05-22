@@ -7,6 +7,8 @@ import logo from '../assets/logo.png'
 import { useState, useEffect } from 'react'
 import { auth } from '../firebase/auth'
 import axios from 'axios'
+import upload from '../assets/upload.png'
+import logout_img from '../assets/logout.png'
 
 const Navbar = () => {
   const logout = () => {
@@ -59,15 +61,14 @@ const Navbar = () => {
       <div 
         className="flex flex-row gap-4 font-medium"
       >
-        <a href="/upload"
-          className="self-center text-white align-middle hover:text-blue-500"
-        >
-          Upload
+        <a href="/upload">
+          <img src={upload} alt="upload" className="w-[48px] pt-1 self-center align-middle"/>
         </a>
+        
         {user ? 
-          ( <button 
-            className="px-4 py-1 text-white border-2 rounded-lg border-violet-500 hover:text-violet-500"  
-            onClick={logout}>Logout</button> ) : 
+          ( <a onClick={logout}>
+            <img src={logout_img} alt="upload" className="cursor-pointer w-[48px] pt-1 self-center align-middle"/>
+            </a>) : 
           ( null )
         }
       </div>
