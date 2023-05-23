@@ -7,15 +7,18 @@ const AdminDashboard = () => {
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
-    auth.onAuthStateChanged(user => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
       if(user) {
         setUserId(user.uid);
       } else {
         setUserId(null);
       }
     });
-    console.log(userId);
-  }, [userId]);
+  
+    // perform cleanup
+    return () => unsubscribe();
+  }, []); // empty dependency array
+  
 
   return (
     <div className="pt-[120px] bg-slate-800">
