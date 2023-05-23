@@ -22,7 +22,7 @@ module.exports = {
         xl: "18px",
       },
       backgroundImage: {
-        "background": "url('src/assets/Container.png')"
+        "background": "url('src/assets/container.webp')"
       }
     },
     screens: {

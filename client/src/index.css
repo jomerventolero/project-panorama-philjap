@@ -24,3 +24,20 @@
     cursor: -moz-grabbing;
     cursor: -webkit-grabbing;
 }
+
+.card-component {
+    transition: transform 0.3s;
+  }
+  
+.card-component:hover {
+    transform: scale(1.15);
+}
+
+.bg-glass {
+    @apply bg-[rgba(255,255,255,0.1)] backdrop-blur-[10px];
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+  

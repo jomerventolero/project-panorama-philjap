@@ -17,16 +17,16 @@ const CardComponent = ({ project, onClick }) => {
 
   return (
     <div 
-      className="max-w-md m-3 mx-auto overflow-hidden font-sans shadow-md cursor-pointer rounded-xl md:max-w-2xl" 
+      className="z-20 m-3 mx-auto overflow-hidden font-sans shadow-md cursor-pointer w-72 card-component bg-glass rounded-xl" 
       onClick={onClick}
     >
-      <div className="flex-col md:flex">
+      <div className="flex-col pt-8 md:flex">
         <div className="md:flex-shrink-0">
           {imageURL && <img className="object-cover w-3/4 h-64 m-auto rounded-xl md:w-48" src={imageURL} alt={project.title} />}
         </div>
         <div className="p-8">
           <div className="font-semibold tracking-wide text-indigo-500 uppercase text-md">{project.title}</div>
-          <p className="p-8 mt-2 text-white">{project.description}</p>
+          <p className="mt-2 text-white">{project.description}</p>
         </div>
       </div>
     </div>
