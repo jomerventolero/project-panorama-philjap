@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+
+
 import Loader from './Loader';
 import axios from 'axios';
 import CardComponent from './CardComponent';
@@ -13,22 +16,32 @@ const ProjectsList = ({ userId }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const response = await axios.get(`http://localhost:3002/api/projects/${userId}`);
-        setProjects(response.data);
-        setIsLoading(false);
-      } catch (error) {
-        setError(error.message);
-        setIsLoading(false);
-      }
-    };
+        if (userId !== null) {
+          try {
+            const response = await axios.get(`http://localhost:3002/api/projects/${userId}`);
+            setProjects(response.data);
+            setIsLoading(false);
+          } catch (error) {
+            setError(error.message);
+            setIsLoading(false);
+          }
+        } else {
+          setIsLoading(false);
+        }
+      };
+      
 
     fetchData();
   }, [userId]);
 
-  const handleCardClick = (project) => {
-    setSelectedImage(project.images[0]); // Set the first image of the selected project
+  // Before passing the image to PanoramaViewer, convert the Google Storage link to a direct URL
+  const handleCardClick = async (project) => {
+    const storage = getStorage();
+    const gsReference = ref(storage, project.images[0].imageUrl);
+    const url = await getDownloadURL(gsReference);
+    setSelectedImage(url);
   }
+  
 
   if (isLoading) {
     return <Loader />;
