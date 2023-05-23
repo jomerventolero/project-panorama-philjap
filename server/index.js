@@ -80,27 +80,36 @@
   };
    
 
-  /* This code defines an endpoint for retrieving a user's first name from Firestore. When a GET request
-  is made to the '/user' endpoint, the function retrieves the ID token from the request headers. It
-  then verifies the authenticity of the token using the Firebase Admin SDK and retrieves the user's
-  first name from Firestore using the decoded token's UID. Finally, it sends a response to the client
-  with the user's first name. If there is an error during the process, it sends an error response with
-  the error message. */
+/* The above code is defining a route for the "/user" endpoint in an Express app. The route is
+protected by a Firebase authentication middleware called "validateFirebaseIdToken". When a GET
+request is made to this endpoint, the code retrieves the user data from a Firestore database using
+the user ID from the Firebase authentication token. If the user document does not exist, a 404 error
+is returned. If the user document exists but does not have a "firstName" field, a 404 error is
+returned. Otherwise, the user's first name is returned in the response. If there is an error
+retrieving */
   app.get('/user', validateFirebaseIdToken, async (req, res) => {
-    const idToken = req.headers.authorization;   
     try {
-      const decodedToken = await admin.auth().verifyIdToken(idToken);   
       const userSnapshot = await db
         .collection('users')
-        .doc(decodedToken.uid)
+        .doc(req.user.uid)
         .get();
-      const userData = userSnapshot.data();   
+      if (!userSnapshot.exists) {
+        console.log(`No document exists for uid: ${req.user.uid}`);
+        return res.status(404).send({ message: 'User not found' });
+      }
+      const userData = userSnapshot.data();
+      console.log(`User data: ${JSON.stringify(userData)}`); 
+      if (!userData.firstName) {
+        console.log(`No firstName field for uid: ${req.user.uid}`);
+        return res.status(404).send({ message: 'User first name not found' });
+      }
       res.send({ firstName: userData.firstName });
     } catch (error) {
       console.error('Error getting user data:', error);
       res.status(500).send({ message: 'Error getting user data' });
     }
   });
+  
 
 
   /* This code defines an endpoint for user registration. When a POST request is made to the '/register'
@@ -154,25 +163,6 @@
       res.status(500).send({ message: 'Error creating new user' });
     }
   });
-
-
-  app.get('/projects/:userId', async (req, res) => {
-    const { userId } = req.params;
-    const projectsRef = db.collection('projects');
-    const snapshot = await projectsRef.where('userId', '==', userId).get();  
-    if (snapshot.empty) {
-      res.status(404).send('No project found');
-      console.log('No matching documents.');
-    } else {
-      let projects = [];
-      snapshot.forEach(doc => {
-        let id = doc.id;
-        let data = doc.data();
-        projects.push({ id, ...data });
-      });
-      res.send(projects);
-    }
-  });   
 
 
   /* The above code is defining an endpoint for a GET request to retrieve all projects for a given user
@@ -232,28 +222,6 @@
     } catch (error) {
       console.error('Error getting user projects', error);
       res.status(500).send('Error getting user projects');
-    }
-  });
-
-
-  app.get('/project/:uid/:title', async (req, res) => {
-    const { uid, title } = req.params;
-    const projectsRef = db.collection('projects');      
-    try {
-      const snapshot = await projectsRef.where('userId', '==', uid).where('title', '==', title).get();
-      if (snapshot.empty) {
-        res.status(404).send('No project found');
-      } else {
-        let projects = [];
-        snapshot.forEach(doc => {
-          let id = doc.id;
-          let data = doc.data();
-          projects.push({ id, ...data });
-        });
-        res.send(projects);
-      }
-    } catch (error) {
-      res.status(500).send(error.message);
     }
   });
 
