@@ -1,9 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import Loader from './Loader';
 
 const PanoramaViewer = ({image}) => {
   const containerRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let camera, scene, renderer, controls;
@@ -22,15 +24,8 @@ const PanoramaViewer = ({image}) => {
       scene = new THREE.Scene();
 
       // Load the panorama image
-      // Load the panorama image
       const loader = new THREE.TextureLoader();
-      const texture = typeof image === 'string' ? loader.load(image) : null;
-
-      if (!texture) {
-        console.error('Invalid image URL:', image);
-        return;
-      }
-
+      const texture = loader.load(image, () => setIsLoading(false));
 
       // Set the texture wrapping and flipping options
       texture.wrapS = THREE.RepeatWrapping;
@@ -38,14 +33,10 @@ const PanoramaViewer = ({image}) => {
 
       // Create a new sphere geometry to hold the panorama image
       const geometry = new THREE.SphereGeometry(500, 60, 40);
-
-      // Flip the geometry inside out so that the image is displayed on the inside of the sphere
       geometry.scale(-1, 1, 1);
 
       // Create a new material with the loaded texture
-      const material = new THREE.MeshBasicMaterial({
-        map: texture
-      });
+      const material = new THREE.MeshBasicMaterial({ map: texture });
 
       // Create a new mesh with the geometry and material
       const mesh = new THREE.Mesh(geometry, material);
@@ -55,36 +46,26 @@ const PanoramaViewer = ({image}) => {
 
       // Create a new WebGL renderer object
       renderer = new THREE.WebGLRenderer();
-
-      // Set the renderer size to the window size
       renderer.setSize(window.innerWidth, window.innerHeight);
 
       // Append the renderer to the container
       containerRef.current.appendChild(renderer.domElement);
 
-      // Create a new OrbitControls object to enable mouse drag controls
+      // Create a new OrbitControls object
       controls = new OrbitControls(camera, renderer.domElement);
-
-      // Disable vertical movement of the camera
       controls.enableZoom = false;
       controls.enablePan = false;
-
-      // Set the controls to rotate around the panorama image
       controls.rotateSpeed = -0.25;
 
       // Set the render loop
       renderer.setAnimationLoop(() => {
-        // Update the OrbitControls
         controls.update();
-
-        // Render the scene with the camera and renderer
         renderer.render(scene, camera);
       });
     }
 
     // Resize the renderer when the window size changes
     const handleResize = () => {
-      // Set the camera aspect ratio and the renderer size to match the window size
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
@@ -96,14 +77,17 @@ const PanoramaViewer = ({image}) => {
     return () => {
       window.removeEventListener('resize', handleResize);
       if (containerRef.current) {
-        // Remove the renderer's DOM element from the container
         containerRef.current.removeChild(renderer.domElement);
       }
       renderer.dispose();
     };
-  }, []);
+  }, [image]);
 
-  return <div ref={containerRef} />;
+  return (
+    <div ref={containerRef}>
+      {isLoading && <Loader />}
+    </div>
+  );
 };
 
 export default PanoramaViewer;
