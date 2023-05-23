@@ -61,10 +61,10 @@ const Navbar = () => {
         <a className="" href="/">
           <img src={logo} alt="Philjap Logo" className="w-[78px]"/>
         </a>
-        <a>
-          <span className='px-8 pt-4 font-medium text-white align-middle'>{firstName}</span>
-        </a>
       </div>
+      <a className="mx-auto">
+          <span className='px-8 pt-4 font-medium text-white align-middle'>{firstName}</span>
+      </a>
       <div 
         className="flex flex-row gap-4 font-medium"
       >
