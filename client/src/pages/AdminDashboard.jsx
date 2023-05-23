@@ -21,7 +21,7 @@ const AdminDashboard = () => {
   
 
   return (
-    <div className="pt-[120px] bg-cover bg-slate-800">
+    <div className="pt-[120px] h-full w-full bg-cover bg-slate-800">
       <Navbar />
       <div className="w-screen h-screen">
         <ProjectsList userId={userId} />

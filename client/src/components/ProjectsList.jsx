@@ -57,13 +57,14 @@ const ProjectsList = ({ userId }) => {
   }
 
   return (
-    <div className="flex gap-8 py-2 overflow-x-auto -z-10 flex-nowrap">
+    <div className="z-40 flex gap-8 py-2 overflow-x-auto scrollbar scrollbar-thumb-rounded scrollbar-thumb-gray-500 flex-nowrap">
       {projects.map((project, index) => (
         <CardComponent key={index} project={project} onClick={() => handleCardClick(project)} />
       ))}
       {selectedImage && <PanoramaViewer image={selectedImage} />}
     </div>
   );
+
 };
 
 export default ProjectsList;
