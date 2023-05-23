@@ -20,6 +20,7 @@
    const auth = admin.auth();
    const db = admin.firestore();
    const multer = require('multer');
+   const bucket = admin.storage().bucket();
    
 
    /* The code is configuring and initializing a multer middleware for handling file uploads in a
@@ -36,8 +37,6 @@
       cb(null, file.fieldname + '-' + Date.now()); // sets the name of the file that will be saved.
     },
   });
-
-  let upload = multer({ storage: storage });
    
   /* `app.use(cors())` enables Cross-Origin Resource Sharing (CORS) for the Express server, allowing it
   to receive requests from other domains. `app.use(express.json())` is middleware that parses incoming
@@ -79,6 +78,19 @@
     }
   };
    
+  const upload = multer({
+    storage: multer.diskStorage({
+      destination: 'uploads/',
+      filename: function (req, file, cb) {
+        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+      }
+    }),
+    limits: { fileSize: 2000000 }, // In bytes: 2000000 bytes = 2 MB
+    fileFilter: function (req, file, cb) {
+      checkFileType(file, cb);
+    }
+  });
+  
 
 /* The above code is defining a route for the "/user" endpoint in an Express app. The route is
 protected by a Firebase authentication middleware called "validateFirebaseIdToken". When a GET
@@ -165,6 +177,64 @@ retrieving */
   });
 
 
+  /* The code below is a server-side code written in JavaScript using the Express framework. It defines
+  a route for handling file uploads to Google Cloud Storage and Firestore. When a POST request is
+  made to the '/upload' endpoint, it expects a multipart form data with an array of images, a title,
+  and a description. It then generates a unique project ID using the uuid library, creates a Promise
+  for each image file, and uploads it to Google Cloud Storage using the Google Cloud Storage Node.js
+  client library. Once the upload is complete, it creates an image record with the image ID, title,
+  description, */
+  app.post('/upload', upload.array('images'), async (req, res) => {
+    try {
+      const { title, description } = req.body;
+      const projectId = uuid.v4();
+  
+      const imagesPromises = req.files.map((file) => {
+        const id = uuid.v4();
+        const blob = bucket.file(`images/project/${req.body.uid}/${title}/${id}.jpg`);
+        
+        const blobWriter = blob.createWriteStream({
+          metadata: {
+            contentType: file.mimetype,
+          },
+        });
+  
+        return new Promise((resolve, reject) => {
+          blobWriter.on('error', reject);
+          blobWriter.on('finish', async () => {
+            const imageUrl = `gs://${bucket.name}/${blob.name}`;
+            const imageRecord = {
+              id,
+              imageTitle: title,
+              imageDescription: description,
+              imageUrl,
+            };
+  
+            resolve(imageRecord);
+          });
+  
+          fs.createReadStream(file.path).pipe(blobWriter);
+        });
+      });
+  
+      const images = await Promise.all(imagesPromises);
+  
+      const projectData = {
+        id: projectId,
+        title,
+        description,
+        images,
+      };
+  
+      const docRef = db.collection('projects').doc(projectId);
+      await docRef.set(projectData);
+  
+      res.status(200).send(projectData);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
+  });
+
   /* The above code is defining an endpoint for a GET request to retrieve all projects for a given user
   ID. It uses Firebase Firestore to query the database for all collections under the "projects"
   document for the specified user ID. For each project collection, it retrieves all documents and
@@ -224,49 +294,6 @@ retrieving */
       res.status(500).send('Error getting user projects');
     }
   });
-
-
-  app.post('/upload', upload.array('images', 15), async (req, res) => {
-  try {
-    const userId = req.headers['x-user-id'];
-    const projectName = req.body.projectName;
-    const titles = req.body.titles;
-    const descriptions = req.body.descriptions;
-    const files = req.files;  
-    if (!userId || !projectName || !titles || !descriptions || !files) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }  
-    const bucket = admin.storage().bucket();
-    const userFolder = `${userId}/${projectName}/`;  
-    // Upload each file to Firebase Storage
-    const uploadPromises = files.map(async (file, index) => {
-      const title = titles[index];
-      const description = descriptions[index];
-      const filename = `${title}_${file.originalname}`;
-      const fileRef = bucket.file(`${userFolder}${filename}`);  
-      const metadata = {
-        metadata: {
-          title: title,
-          description: description,
-          userId: userId
-        }
-      };  
-      await bucket.upload(file.path, {
-        destination: `${userFolder}${filename}`,
-        metadata: metadata,
-      });  
-      // delete file from local storage
-      await unlinkFile(file.path);
-    });  
-    // Wait for all uploads to complete
-    await Promise.all(uploadPromises);  
-    res.status(200).json({ message: 'Panorama images uploaded successfully' });
-  } catch (error) {
-    console.error('Error uploading panorama images:', error);
-    res.status(500).json({ error: 'An error occurred while uploading panorama images' });
-  }
-  });   
-
 
   app.get('/test', (req, res) => {
     res.send('Success!');
