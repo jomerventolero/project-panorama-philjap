@@ -11,6 +11,9 @@ import upload from '../assets/upload.png'
 import logout_img from '../assets/logout.png'
 
 const Navbar = () => {
+  const [firstName, setFirstName] = useState(null);
+  const [user, setUser] = useState(null);
+
   const logout = () => {
     auth.signOut(auth)
       .then(() => {
@@ -21,33 +24,35 @@ const Navbar = () => {
         alert('An error occurred while logging out');
       });
   };
-  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setUser(user);
+      getFirstName(user); // Update the getFirstName call to pass in the user
     });
 
     // Clean up the subscription when the component unmounts
     return () => unsubscribe();
   }, []);
   
-  const [firstName, setFirstName] = useState("")
-
-  useEffect(() => {
-    getFirstName()
-  }, [])
-  
-  const getFirstName = () => {
-    const user = auth.currentUser;
-      axios.get(`http://localhost:3002/user`) 
-      .then (res => {
-        console.log(res.data)
-        setFirstName(res.data.firstName)
-      })
-      .catch(err => {
-        console.log(err)
-      })
+  const getFirstName = (user) => {
+    if (user) { // Only make the request if the user is logged in
+      user.getIdToken(true)
+        .then((idToken) => {
+          axios.get('http://localhost:3002/user', {
+            headers: {
+              Authorization: `Bearer ${idToken}`,
+            },
+          })
+          .then(res => {
+            console.log(res.data);
+            setFirstName(res.data.firstName);
+          })
+          .catch(err => {
+            console.log(err);
+          });
+        });
+    }
   }
 
   return (
@@ -56,7 +61,9 @@ const Navbar = () => {
         <a className="" href="/">
           <img src={logo} alt="Philjap Logo" className="w-[78px]"/>
         </a>
-        <span className='font-medium text-white'>{firstName}</span>
+        <a>
+          <span className='px-8 pt-4 font-medium text-white align-middle'>{firstName}</span>
+        </a>
       </div>
       <div 
         className="flex flex-row gap-4 font-medium"
