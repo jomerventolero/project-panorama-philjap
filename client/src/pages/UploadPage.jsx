@@ -1,13 +1,14 @@
 import React from 'react'
 import Navbar from '../components/Navbar'
-import PanoramaUploader from '../components/PanoramaUploader'
+import UploadComponent from '../components/UploadComponent'
+
 
 const UploadPage = () => {
   return (
     <div className="w-screen h-full bg-cover bg-slate-700">
         <Navbar />
         <div className="pt-[100px]">
-            <PanoramaUploader />
+            <UploadComponent />
         </div>
     </div>
   )
