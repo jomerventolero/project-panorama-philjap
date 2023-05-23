@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import Skeleton from 'react-loading-skeleton';
 
-
-import Loader from './Loader';
 import axios from 'axios';
 import CardComponent from './CardComponent';
 import PanoramaViewer from './PanoramaViewer';
@@ -12,7 +11,6 @@ const ProjectsList = ({ userId }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,7 +27,6 @@ const ProjectsList = ({ userId }) => {
           setIsLoading(false);
         }
       };
-      
 
     fetchData();
   }, [userId]);
@@ -41,10 +38,18 @@ const ProjectsList = ({ userId }) => {
     const url = await getDownloadURL(gsReference);
     setSelectedImage(url);
   }
-  
 
   if (isLoading) {
-    return <Loader />;
+    return (
+      <div className="flex gap-8 py-2 overflow-x-auto -z-10 flex-nowrap">
+        {Array(5).fill().map((item, index) => (
+          <div key={index} className="w-64 h-64 m-3 rounded-md">
+            <Skeleton height={100} />
+            <Skeleton height={50} />
+          </div>
+        ))}
+      </div>
+    );
   }
 
   if (error) {
@@ -52,7 +57,7 @@ const ProjectsList = ({ userId }) => {
   }
 
   return (
-    <div className="flex flex-wrap justify-center">
+    <div className="flex gap-8 py-2 overflow-x-auto -z-10 flex-nowrap">
       {projects.map((project, index) => (
         <CardComponent key={index} project={project} onClick={() => handleCardClick(project)} />
       ))}

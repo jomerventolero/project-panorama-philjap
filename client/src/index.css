@@ -26,7 +26,7 @@
 }
 
 .card-component {
-    transition: transform 0.3s;
+    transition: transform 0.5s;
   }
   
 .card-component:hover {
