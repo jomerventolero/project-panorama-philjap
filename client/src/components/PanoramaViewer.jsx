@@ -22,8 +22,15 @@ const PanoramaViewer = ({image}) => {
       scene = new THREE.Scene();
 
       // Load the panorama image
+      // Load the panorama image
       const loader = new THREE.TextureLoader();
-      const texture = loader.load(image);
+      const texture = typeof image === 'string' ? loader.load(image) : null;
+
+      if (!texture) {
+        console.error('Invalid image URL:', image);
+        return;
+      }
+
 
       // Set the texture wrapping and flipping options
       texture.wrapS = THREE.RepeatWrapping;
