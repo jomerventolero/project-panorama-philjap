@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import Skeleton from 'react-loading-skeleton';
 
 const CardComponent = ({ project, onClick }) => {
   const [imageURL, setImageURL] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchImageURL = async () => {
@@ -10,6 +12,7 @@ const CardComponent = ({ project, onClick }) => {
       const gsReference = ref(storage, project.images[0].imageUrl);
       const url = await getDownloadURL(gsReference);
       setImageURL(url);
+      setIsLoading(false);
     };
 
     fetchImageURL();
@@ -22,7 +25,7 @@ const CardComponent = ({ project, onClick }) => {
     >
       <div className="flex-col pt-8 md:flex">
         <div className="md:flex-shrink-0">
-          {imageURL && <img className="object-cover w-3/4 h-64 m-auto rounded-xl md:w-48" src={imageURL} alt={project.title} />}
+          {isLoading ? <Skeleton height={200} /> : <img className="object-cover w-3/4 h-64 m-auto rounded-xl md:w-48" src={imageURL} alt={project.title} />}
         </div>
         <div className="p-8">
           <div className="font-semibold tracking-wide text-indigo-500 uppercase text-md">{project.title}</div>

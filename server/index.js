@@ -235,6 +235,26 @@ retrieving */
     }
   });
 
+
+  app.get('/api/users/:userId', async (req, res) => {
+    const { userId } = req.params;
+  
+    try {
+      const userSnapshot = await db.collection('users').doc(userId).get();
+      const userData = userSnapshot.data();
+  
+      if (!userData) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      return res.json(userData);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Internal Server Error' });
+    }
+  });
+
+
   /* The above code is defining an endpoint for a GET request to retrieve all projects for a given user
   ID. It uses Firebase Firestore to query the database for all collections under the "projects"
   document for the specified user ID. For each project collection, it retrieves all documents and
@@ -295,10 +315,55 @@ retrieving */
     }
   });
 
+
   app.get('/test', (req, res) => {
     res.send('Success!');
   });   
 
+  /* The code below is defining an endpoint for a GET request to retrieve all projects for a given user
+  ID. It uses Firebase Firestore to query the database for all collections under the "projects"
+  document for the specified user ID. For each project collection, it retrieves all documents and
+  their associated images, and constructs an array of project objects with their respective image
+  objects. Finally, it sends a JSON response with the array of projects. If there are no projects
+  found for the user, it sends a 404 error response. If there is an error retrieving the projects, it
+  sends a 500 error response. */
+  app.get('/api/users/:userId/projects', async (req, res) => {
+    const { userId } = req.params;
+  
+    try {
+      // Fetch the projects document for this user
+      const userProjectsSnapshot = await db.collection('projects').doc(userId).collection('project').get();
+  
+      // Initialize an array to hold the project data
+      let projects = [];
+  
+      userProjectsSnapshot.forEach(doc => {
+        let projectData = doc.data();
+  
+        // Fetch images for each project
+        const imagesSnapshot = await db.collection('projects').doc(userId).collection('project').doc(doc.id).collection('images').get();
+        
+        let images = [];
+        
+        imagesSnapshot.forEach(imgDoc => {
+          images.push(imgDoc.data());
+        });
+        
+        // Add images data to project data
+        projectData.images = images;
+        
+        // Add the project to the projects array
+        projects.push(projectData);
+      });
+  
+      // Return the projects array
+      return res.json(projects);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Internal Server Error' });
+    }
+  });
+  
 
   /* The above code starts the server and listens on the specified port. When the server starts running,
   it will log a message to the console indicating the port number on which the server is running. */

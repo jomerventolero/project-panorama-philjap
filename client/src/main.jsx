@@ -9,7 +9,6 @@ import UploadPage from './pages/UploadPage';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import './index.css'
-import ProjectsList from './components/ProjectsList';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 

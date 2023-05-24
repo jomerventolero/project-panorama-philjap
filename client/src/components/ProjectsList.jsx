@@ -11,22 +11,23 @@ const ProjectsList = ({ userId }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isCardVisible, setIsCardVisible] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
-        if (userId !== null) {
-          try {
-            const response = await axios.get(`http://localhost:3002/api/projects/${userId}`);
-            setProjects(response.data);
-            setIsLoading(false);
-          } catch (error) {
-            setError(error.message);
-            setIsLoading(false);
-          }
-        } else {
+      if (userId !== null) {
+        try {
+          const response = await axios.get(`http://localhost:3002/api/projects/${userId}`);
+          setProjects(response.data);
+          setIsLoading(false);
+        } catch (error) {
+          setError(error.message);
           setIsLoading(false);
         }
-      };
+      } else {
+        setIsLoading(false);
+      }
+    };
 
     fetchData();
   }, [userId]);
@@ -37,6 +38,12 @@ const ProjectsList = ({ userId }) => {
     const gsReference = ref(storage, project.images[0].imageUrl);
     const url = await getDownloadURL(gsReference);
     setSelectedImage(url);
+    setIsCardVisible(false);
+  }
+
+  const handleBackButtonClick = () => {
+    setIsCardVisible(true);
+    setSelectedImage(null);
   }
 
   if (isLoading) {
@@ -57,14 +64,16 @@ const ProjectsList = ({ userId }) => {
   }
 
   return (
-    <div className="z-40 flex gap-8 py-2 overflow-x-auto scrollbar scrollbar-thumb-rounded scrollbar-thumb-gray-500 flex-nowrap">
-      {projects.map((project, index) => (
+    <div className="z-40 flex flex-row h-full gap-8 py-2 overflow-x-auto scrollbar scrollbar-thumb-rounded scrollbar-thumb-gray-500 flex-nowrap">
+      {isCardVisible && projects.map((project, index) => (
         <CardComponent key={index} project={project} onClick={() => handleCardClick(project)} />
       ))}
-      {selectedImage && <PanoramaViewer image={selectedImage} />}
+      <div className="flex flex-col gap-2">
+        {!isCardVisible && <button className="font-medium text-white hover:text-violet-500 h-[50px]" onClick={handleBackButtonClick}>Back to Projects</button>}
+        {selectedImage && <PanoramaViewer image={selectedImage} />}
+      </div>
     </div>
   );
-
 };
 
 export default ProjectsList;

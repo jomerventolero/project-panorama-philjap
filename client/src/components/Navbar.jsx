@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react'
 import { auth } from '../firebase/auth'
 import axios from 'axios'
 import upload from '../assets/upload.png'
-import logout_img from '../assets/logout.png'
+import Menu from './Menu'
 
 const Navbar = () => {
   const [firstName, setFirstName] = useState(null);
@@ -45,7 +45,6 @@ const Navbar = () => {
             },
           })
           .then(res => {
-            console.log(res.data);
             setFirstName(res.data.firstName);
           })
           .catch(err => {
@@ -73,9 +72,7 @@ const Navbar = () => {
         </a>
         
         {user ? 
-          ( <a onClick={logout}>
-            <img src={logout_img} alt="upload" className="cursor-pointer w-[48px] pt-1 self-center align-middle"/>
-            </a>) : 
+          ( <Menu logout={logout} /> ) : 
           ( null )
         }
       </div>

@@ -15,7 +15,7 @@ const PanoramaViewer = ({image}) => {
 
     function init() {
       // Create a new camera object
-      camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 1, 1000);
+      camera = new THREE.PerspectiveCamera(100, (window.innerWidth - 40) / (window.innerHeight - 40), 1, 1000);
 
       // Set the camera position
       camera.position.set(0, 0, 0.1);
@@ -46,7 +46,7 @@ const PanoramaViewer = ({image}) => {
 
       // Create a new WebGL renderer object
       renderer = new THREE.WebGLRenderer();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setSize(window.innerWidth - 40, window.innerHeight - 40);
 
       // Append the renderer to the container
       containerRef.current.appendChild(renderer.domElement);
@@ -66,9 +66,9 @@ const PanoramaViewer = ({image}) => {
 
     // Resize the renderer when the window size changes
     const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.aspect = (window.innerWidth - 40) / (window.innerHeight - 40);
       camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setSize(window.innerWidth - 40, window.innerHeight - 40);
     };
 
     window.addEventListener('resize', handleResize);
@@ -84,7 +84,7 @@ const PanoramaViewer = ({image}) => {
   }, [image]);
 
   return (
-    <div ref={containerRef}>
+    <div ref={containerRef} style={{padding: 20, width: 'calc(100vw - 40px)', height: 'calc(100vh - 40px)', boxSizing: 'border-box'}}>
       {isLoading && <Loader />}
     </div>
   );
