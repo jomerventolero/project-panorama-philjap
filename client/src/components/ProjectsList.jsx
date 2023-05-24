@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import Skeleton from 'react-loading-skeleton';
-
 import axios from 'axios';
 import CardComponent from './CardComponent';
-import PanoramaViewer from './PanoramaViewer';
 
 const ProjectsList = ({ userId }) => {
   const [projects, setProjects] = useState([]);
-  const [selectedImage, setSelectedImage] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isCardVisible, setIsCardVisible] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,23 +30,13 @@ const ProjectsList = ({ userId }) => {
     fetchData();
   }, [userId]);
 
-  // Before passing the image to PanoramaViewer, convert the Google Storage link to a direct URL
-  const handleCardClick = async (project) => {
-    const storage = getStorage();
-    const gsReference = ref(storage, project.images[0].imageUrl);
-    const url = await getDownloadURL(gsReference);
-    setSelectedImage(url);
-    setIsCardVisible(false);
-  }
-
-  const handleBackButtonClick = () => {
-    setIsCardVisible(true);
-    setSelectedImage(null);
+  const handleCardClick = (projectId) => {
+    navigate(`/projects/${projectId}`);
   }
 
   if (isLoading) {
     return (
-      <div className="flex gap-8 py-2 overflow-x-auto -z-10 flex-nowrap">
+      <div className="flex gap-8 py-2 -z-10 flex-nowrap">
         {Array(5).fill().map((item, index) => (
           <div key={index} className="w-64 h-64 m-3 rounded-md">
             <Skeleton height={100} />
@@ -64,14 +52,10 @@ const ProjectsList = ({ userId }) => {
   }
 
   return (
-    <div className="z-40 flex flex-row h-full gap-8 py-2 overflow-x-auto scrollbar scrollbar-thumb-rounded scrollbar-thumb-gray-500 flex-nowrap">
-      {isCardVisible && projects.map((project, index) => (
-        <CardComponent key={index} project={project} onClick={() => handleCardClick(project)} />
+    <div className="z-40 flex justify-center h-full gap-8 py-2 flex-nowrap">
+      {projects.map((project, index) => (
+        <CardComponent key={index} project={project} onClick={() => handleCardClick(project.id)} />
       ))}
-      <div className="flex flex-col gap-2">
-        {!isCardVisible && <button className="font-medium text-white hover:text-violet-500 h-[50px]" onClick={handleBackButtonClick}>Back to Projects</button>}
-        {selectedImage && <PanoramaViewer image={selectedImage} />}
-      </div>
     </div>
   );
 };

@@ -20,7 +20,7 @@ const CardComponent = ({ project, onClick }) => {
 
   return (
     <div 
-      className="z-40 m-3 mx-auto overflow-hidden font-sans shadow-md cursor-pointer w-72 card-component bg-glass rounded-xl" 
+      className="z-40 m-3 mx-auto overflow-hidden font-sans shadow-md cursor-pointer w-72 h-[500px] card-component bg-glass rounded-xl" 
       onClick={onClick}
     >
       <div className="flex-col pt-8 md:flex">
@@ -29,7 +29,7 @@ const CardComponent = ({ project, onClick }) => {
         </div>
         <div className="p-8">
           <div className="font-semibold tracking-wide text-indigo-500 uppercase text-md">{project.title}</div>
-          <p className="mt-2 text-justify text-white">{project.description}</p>
+          <p className="mt-2 text-sm text-justify text-white">{project.description}</p>
         </div>
       </div>
     </div>

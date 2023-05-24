@@ -8,6 +8,7 @@ import LoginPage from './pages/LoginPage';
 import UploadPage from './pages/UploadPage';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
+import ProjectViewer from './components/ProjectViewer';
 import './index.css'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -22,6 +23,7 @@ root.render(
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/upload" element={<ProtectedRoute><UploadPage /></ProtectedRoute>} />
+        <Route path="/projects/:projectId" element={<ProjectViewer />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

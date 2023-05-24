@@ -37,7 +37,7 @@ const UploadComponent = ({ userId }) => {
 
   return (
     <div className="flex items-center justify-center min-h-screen text-white bg-gray-900">
-      <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md">
+      <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md p-8 bg-glass">
         <div className="mb-4">
           <label className="block mb-2 text-sm font-bold text-gray-300">
             Project Title:
