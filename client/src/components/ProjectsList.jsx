@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import Skeleton from 'react-loading-skeleton';
 import axios from 'axios';
 import CardComponent from './CardComponent';

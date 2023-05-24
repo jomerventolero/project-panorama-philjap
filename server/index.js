@@ -257,28 +257,53 @@ retrieving */
 
   app.get('/api/projects/images/:projectId', async (req, res) => {
     const { projectId } = req.params;
+    const { userId } = req.headers; // Assuming the user ID is provided in the request headers
   
     try {
-      // Fetch the images for the project
-      const projectRef = db.collection('project').doc(projectId);
-      const imagesSnapshot = await projectRef.collection('images').get();
+      // Fetch the project document
+      const userRef = db.collection('projects').doc(userId);
+      const projectRef = userRef.collection('project').doc(projectId);
+      const projectDoc = await projectRef.get();
   
-      const images = imagesSnapshot.docs.map((doc) => {
-        const { imageTitle, imageDescription, imageUrl } = doc.data();
-        return {
+      if (!projectDoc.exists) {
+        res.status(404).send('Project not found');
+        return;
+      }
+  
+      const projectData = projectDoc.data();
+      const { title, description } = projectData;
+  
+      // Fetch the images for the project
+      const imagesSnapshot = await projectRef.collection('images').get();
+      const images = [];
+  
+      imagesSnapshot.forEach((imageDoc) => {
+        const imageData = imageDoc.data();
+        const { imageUrl, imageTitle, imageDescription } = imageData;
+        images.push({
+          id: imageDoc.id,
+          imageUrl,
           imageTitle,
           imageDescription,
-          imageUrl,
-        };
+        });
       });
   
-      // Return the images
-      return res.json(images);
+      // Construct the response object
+      const projectResponse = {
+        id: projectId,
+        title,
+        description,
+        images,
+      };
+  
+      res.json(projectResponse);
     } catch (error) {
       console.error('Error fetching project images:', error);
-      return res.status(500).json({ message: 'Error fetching project images' });
+      res.status(500).send('Error fetching project images');
     }
   });
+  
+  
   
   
 
