@@ -23,7 +23,8 @@ root.render(
         <Route path="/login" element={<LoginPage />} />
         <Route path="/aboutus" element={<ContactUsPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/dashboard-admin" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        
         <Route path="/upload" element={<ProtectedRoute><UploadPage /></ProtectedRoute>} />
         <Route path="/projects/:projectId" element={<ProjectViewer />} />
       </Routes>

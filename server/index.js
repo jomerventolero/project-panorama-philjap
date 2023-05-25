@@ -319,6 +319,21 @@ retrieving */
   });
   
 
+  /* The code below is defining a route for a GET request to retrieve all users from a Firestore
+  database. It first retrieves a snapshot of all documents in the "users" collection, then iterates
+  through each document to extract its ID and data, and finally pushes an object containing the ID and
+  data into an array of users. The array of users is then sent as a response with a status code of
+  200. */
+  app.get('/users', async (req, res) => {
+    const usersSnapshot = await db.collection('users').get();
+    const users = [];
+    usersSnapshot.forEach(doc => {
+      let id = doc.id;
+      let data = doc.data();
+      users.push({ id, ...data });
+    });
+    res.status(200).send(users);
+  });
 
   /* The above code is defining an endpoint for a GET request to retrieve all projects for a given user
   ID. It uses Firebase Firestore to query the database for all collections under the "projects"

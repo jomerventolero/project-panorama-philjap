@@ -62,7 +62,7 @@ const Navbar = () => {
           <img src={logo} alt="Philjap Logo" className="w-[78px]"/>
         </a>
       </div>
-      <a href="/dashboard" className="mx-auto">
+      <a href="/dashboard-admin" className="mx-auto">
           <span className='px-8 pt-4 font-medium text-white align-middle'>{firstName}</span>
       </a>
       <div 

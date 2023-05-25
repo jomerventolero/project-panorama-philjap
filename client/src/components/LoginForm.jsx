@@ -13,20 +13,50 @@ function LoginForm() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [error, setError] = useState('')
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    useEffect(() => {
+      const user = app.auth().currentUser;
+    
+      if (user) {
+        const userId = user.uid;
+        const db = app.firestore();
+    
+        db.collection('users')
+          .doc(userId)
+          .get()
+          .then(doc => {
+            if (doc.exists) {
+              const isAdministrator = doc.data().isAdmin;
+              setIsAdmin(isAdministrator);
+    
+              if (isAdmin) {
+                // Redirect to the admin dashboard
+                window.location.href = '/dashboard-admin';
+              }
+              } else {
+                setIsAdmin(false);
+              }
+          })
+          .catch(error => {
+            console.error('Error fetching user data:', error);
+            setIsAdmin(false);
+          });
+      }
+    }, []);
 
     const handleSignIn = async (e) => {
-        e.preventDefault();
-    
-        try {
-          await auth.signInWithEmailAndPassword(email, password);
-          setEmail('');
-          setPassword('');
-          window.location.href = '/dashboard';
-        } catch (error) {
-          setError(error.message);
-          alert("Invalid email or password");
-        }
-      };
+      e.preventDefault();    
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+        setEmail('');
+        setPassword('');
+        setError(null);
+      } catch (error) {
+        setError(error.message);
+        alert("Invalid email or password");
+      }
+    };
       
   return (
     <div className="flex flex-col justify-center">
