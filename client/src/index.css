@@ -2,6 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
+.body {
+    background-color: #1a202c;
+    color: #fff;
+}
+
+.cardComp {
+    position: relative;
+    left: calc(-50% + 50px); /* Adjust this value to get the right amount of overlap */
+    z-index: 1;
+  }
+  
+  .cardComp:hover {
+    z-index: 2; /* Ensures that the hovered card comes to the front */
+  }
+
+  .panorama {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 50%; /* Adjust as needed */
+  }
+  
+
 .inverted-icon {
     filter: invert(1);
 }

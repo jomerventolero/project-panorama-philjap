@@ -7,7 +7,6 @@
    const serviceAccount = require('./firebase-config/philjaps-firebase-adminsdk-asmoe-c066ae76b2.json');
    const uuid = require('uuid');
 
-
    const app = express();
    const port = process.env.PORT || 3002;
    
@@ -20,6 +19,7 @@
    const auth = admin.auth();
    const db = admin.firestore();
    const multer = require('multer');
+
    const bucket = admin.storage().bucket();
    
 
@@ -254,10 +254,12 @@ retrieving */
     }
   });
 
-
-  app.get('/api/projects/images/:projectId', async (req, res) => {
-    const { projectId } = req.params;
-    const { userId } = req.headers; // Assuming the user ID is provided in the request headers
+  
+  app.get('/api/projects/images/:projectId/:userId', async (req, res) => {
+    const { projectId, userId } = req.params;
+  
+    console.log('projectId', projectId);
+    console.log('userId', userId);
   
     try {
       // Fetch the project document
@@ -277,16 +279,29 @@ retrieving */
       const imagesSnapshot = await projectRef.collection('images').get();
       const images = [];
   
-      imagesSnapshot.forEach((imageDoc) => {
+      // Use Promise.all to wait for all signed URLs to be created
+      await Promise.all(imagesSnapshot.docs.map(async (imageDoc) => {
         const imageData = imageDoc.data();
         const { imageUrl, imageTitle, imageDescription } = imageData;
+  
+        const fileName = imageUrl.replace('gs://philjaps.appspot.com/', ''); // Replace with your bucket URL
+        const file = bucket.file(fileName);
+  
+        // Create a signed URL for the file
+        const config = {
+          action: 'read',
+          expires: '03-09-2491'
+        };
+        const [url] = await file.getSignedUrl(config);
+        
+        // Use the signed URL instead of the gs:// URL
         images.push({
           id: imageDoc.id,
-          imageUrl,
+          imageUrl: url,
           imageTitle,
           imageDescription,
         });
-      });
+      }));
   
       // Construct the response object
       const projectResponse = {
@@ -303,10 +318,6 @@ retrieving */
     }
   });
   
-  
-  
-  
-
 
 
   /* The above code is defining an endpoint for a GET request to retrieve all projects for a given user

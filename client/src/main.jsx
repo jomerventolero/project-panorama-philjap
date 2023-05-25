@@ -11,7 +11,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 import ProjectViewer from './components/ProjectViewer';
 import './index.css'
 
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
 
 root.render(
   <React.StrictMode>

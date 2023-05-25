@@ -30,8 +30,8 @@ const ProjectsList = ({ userId }) => {
   }, [userId]);
 
   const handleCardClick = (projectId) => {
-    navigate(`/projects/${projectId}`);
-  }
+    navigate(`/projects/${projectId}?userId=${userId}`);
+  };
 
   if (isLoading) {
     return (

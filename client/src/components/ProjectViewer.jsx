@@ -3,7 +3,8 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import CardIndvComp from './CardIndvComp';
 import PanoramaViewer from './PanoramaViewer';
-import { auth } from '../firebase/auth'; 
+import { auth } from '../firebase/auth';
+import Navbar from './Navbar';
 
 const ProjectViewer = () => {
   const { projectId } = useParams();
@@ -17,32 +18,42 @@ const ProjectViewer = () => {
         // Get the current user's userId
         const user = auth.currentUser;
         if (user) {
-          const userId = user.uid;
-          setUserId(userId);
-
+          const userIdCurrent = user.uid;
+          setUserId(userIdCurrent);
+  
           // Fetch the project images using the userId
-          const headers = { userId };
-          const response = await axios.get(`http://localhost:3002/api/projects/images/${projectId}`, { headers });
-          setImages(response.data);
+          const response = await axios.get(`http://localhost:3002/api/projects/images/${projectId}/${userIdCurrent}`);
+          setImages(response.data.images);
+        } else {
+          // handle case where no user is signed in
+          console.error("No user signed in");
         }
       } catch (error) {
         console.error(error);
       }
     };
-
+  
     fetchData();
   }, [projectId]);
+  
 
   const handleCardClick = async (imageUrl) => {
     setSelectedImage(imageUrl);
   };
 
   return (
-    <div className="flex justify-center h-full gap-8 py-2 flex-nowrap">
-      {images.map((image, index) => (
-        <CardIndvComp key={index} image={image} onClick={() => handleCardClick(image.imageUrl)} />
-      ))}
-      {selectedImage && <PanoramaViewer image={selectedImage} />}
+    <div>
+      <Navbar />
+      <div className="flex flex-row justify-center h-screen gap-8 py-2 pt-[150px] bg-slate-900">
+        <div className="flex flex-row flex-wrap gap-4">
+          {images.map((image, index) => (
+            <div className="w-1/4 hover:z-10">
+              <CardIndvComp key={index} image={image} onClick={() => handleCardClick(image.imageUrl)} />
+            </div>
+          ))}
+        </div>
+        {selectedImage && <PanoramaViewer image={selectedImage} />}
+      </div>
     </div>
   );
 };
