@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react'
 import { auth } from '../firebase/auth'
 import axios from 'axios'
 import upload from '../assets/upload.png'
+import chat from '../assets/chat.png'
 import Menu from './Menu'
 
 const Navbar = () => {
@@ -67,6 +68,9 @@ const Navbar = () => {
       <div 
         className="flex flex-row gap-4 font-medium"
       >
+        <a href="/chat">
+          <img src={chat} alt="chat" className="w-[48px] pt-1 self-center align-middle"/>
+        </a>
         <a href="/upload">
           <img src={upload} alt="upload" className="w-[48px] pt-1 self-center align-middle"/>
         </a>
