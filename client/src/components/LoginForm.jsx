@@ -6,22 +6,24 @@ attempts to sign in the user using the `auth` object and sets the email and pass
 strings. If there is an error, it sets an error message and displays an alert. The component returns
 a form with email and password input fields, a login button, and a link to a registration page. */
 import React from 'react';
-import { useState } from 'react'
-import { auth } from '../firebase/auth'
+import { useState, useEffect } from 'react'
+import { auth, app } from '../firebase/auth'
+import { useNavigate } from 'react-router-dom'
 
 function LoginForm() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [error, setError] = useState('')
-    const [isAdmin, setIsAdmin] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
       const user = app.auth().currentUser;
-    
+  
       if (user) {
         const userId = user.uid;
         const db = app.firestore();
-    
+  
         db.collection('users')
           .doc(userId)
           .get()
@@ -29,21 +31,23 @@ function LoginForm() {
             if (doc.exists) {
               const isAdministrator = doc.data().isAdmin;
               setIsAdmin(isAdministrator);
-    
-              if (isAdmin) {
+  
+              if (isAdministrator) {
                 // Redirect to the admin dashboard
-                window.location.href = '/dashboard-admin';
+                navigate('/dashboard-admin')
               }
-              } else {
-                setIsAdmin(false);
-              }
+            } else {
+              setIsAdmin(false);
+              window.location.href = '/dashboard-user'
+            }
           })
           .catch(error => {
             console.error('Error fetching user data:', error);
             setIsAdmin(false);
           });
       }
-    }, []);
+  }, []);
+  
 
     const handleSignIn = async (e) => {
       e.preventDefault();    
@@ -52,6 +56,12 @@ function LoginForm() {
         setEmail('');
         setPassword('');
         setError(null);
+        console.log(isAdmin);
+        if (isAdmin) {
+          navigate('/dashboard-admin');
+        } else {
+          navigate('/dashboard-user')
+        }
       } catch (error) {
         setError(error.message);
         alert("Invalid email or password");
