@@ -44,15 +44,18 @@ const ProjectViewer = () => {
   return (
     <div>
       <Navbar />
-      <div className="flex flex-row justify-center h-full w-full gap-8 py-2 pt-[150px] bg-slate-900">
-        <div className="flex flex-row flex-wrap gap-4">
+      <div className="pt-[150px] flex flex-col justify-center items-center">
+        {selectedImage && <PanoramaViewer image={selectedImage} />}
+      </div>
+      <div className="flex flex-row justify-center items-center h-full w-full gap-8 py-2 pt-[50px] bg-slate-900">
+        <div className="flex flex-row flex-wrap gap-4 justify-center">
           {images.map((image, index) => (
             <div className="w-1/4 hover:z-10">
               <CardIndvComp key={index} image={image} onClick={() => handleCardClick(image.imageUrl)} />
             </div>
           ))}
         </div>
-        {selectedImage && <PanoramaViewer image={selectedImage} />}
+        
       </div>
     </div>
   );

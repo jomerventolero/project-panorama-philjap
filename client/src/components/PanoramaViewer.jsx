@@ -72,7 +72,7 @@ const PanoramaViewer = ({image}) => {
     };
 
     window.addEventListener('resize', handleResize);
-
+    
     // Cleanup function in useEffect
     return () => {
       window.removeEventListener('resize', handleResize);
@@ -84,7 +84,7 @@ const PanoramaViewer = ({image}) => {
   }, [image]);
 
   return (
-    <div ref={containerRef} style={{padding: 20, width: 'calc(50vw - 40px)', height: 'calc(50vh - 40px)', boxSizing: 'border-box'}}>
+    <div ref={containerRef} style={{padding: 20, width: 'calc(60vw - 50px)', height: 'calc(60vh - 50px)', boxSizing: 'border-box'}}>
       {isLoading && <Loader />}
     </div>
   );
