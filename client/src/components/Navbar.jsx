@@ -1,7 +1,12 @@
 import React from 'react'
 import logo from '../assets/logo.png'
+
+
+import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 import { useState, useEffect } from 'react'
 import { auth, app } from '../firebase/auth'
+
+
 import axios from 'axios'
 import upload from '../assets/upload.png'
 import chat from '../assets/chat.png'
@@ -11,6 +16,7 @@ const Navbar = () => {
   const [firstName, setFirstName] = useState(null);
   const [user, setUser] = useState(null);
   const [profileUrl, setProfileUrl] = useState('');
+  const storage = getStorage();
 
   const logout = () => {
     auth.signOut()
@@ -27,7 +33,6 @@ const Navbar = () => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setUser(user);
       getFirstName(user);
-      getProfileUrl(user);
     });
 
     return () => unsubscribe();
@@ -52,20 +57,7 @@ const Navbar = () => {
     }
   }
 
-  const getProfileUrl = (user) => {
-    if (user) { 
-      const db = app.firestore();
-      db.collection('users').doc(user.uid).get()
-        .then(doc => {
-          if (doc.exists) {
-            setProfileUrl(doc.data().profileUrl);
-          }
-        })
-        .catch(error => {
-          console.error('Error fetching user profile URL:', error);
-        });
-    }
-  }
+
 
   return (
     <div className="fixed top-0 z-50 flex flex-row justify-between w-full gap-2 px-2 py-2 bg-slate-900">
@@ -75,7 +67,8 @@ const Navbar = () => {
         </a>
       </div>
       <a href="/dashboard-admin" className="mx-auto">
-          <span className='px-8 pt-4 font-medium text-white align-middle'>{firstName}</span>
+          
+          <span className='px-8 pt-4 font-medium text-white align-middle'>Engr. {firstName}</span>
       </a>
       <div className="flex flex-row gap-4 font-medium">
         <a href="/chat">
@@ -84,7 +77,6 @@ const Navbar = () => {
         <a href="/upload">
           <img src={upload} alt="upload" className="w-[48px] pt-1 self-center align-middle"/>
         </a>
-        {profileUrl && <img src={profileUrl} alt="profile" className="w-[48px] pt-1 self-center rounded-full align-middle"/>}
         
         {user ? 
           ( <Menu logout={logout} /> ) : 

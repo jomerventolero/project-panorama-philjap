@@ -13,7 +13,6 @@ async function getUserData(userId) {
     const userData = userDoc.data();
     
     return {
-      firstName: userData.firstName,
       profileUrl: userData.profileUrl,
     };
   } catch (error) {
@@ -23,3 +22,4 @@ async function getUserData(userId) {
 }
 
 export default getUserData;
+

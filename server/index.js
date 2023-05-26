@@ -395,6 +395,27 @@ retrieving */
     }
   });
 
+  app.get('/getProfile/:userId', async (req, res) => {
+    const userId = req.params.userId;
+  
+    try {
+      const userDoc = await db.collection('users').doc(userId).get();
+        
+      if (!userDoc.exists) {
+        throw new Error('User not found');
+      }
+        
+      const userData = userDoc.data();
+        
+      return res.json({
+        profileUrl: userData.profileUrl,
+      });
+    } catch (error) {
+      console.error('Error getting user data:', error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+  
 
   app.get('/test', (req, res) => {
     res.send('Success!');
