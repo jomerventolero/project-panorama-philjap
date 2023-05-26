@@ -44,7 +44,7 @@ const ProjectViewer = () => {
   return (
     <div>
       <Navbar />
-      <div className="flex flex-row justify-center h-full gap-8 py-2 pt-[150px] bg-slate-900">
+      <div className="flex flex-row justify-center h-full w-full gap-8 py-2 pt-[150px] bg-slate-900">
         <div className="flex flex-row flex-wrap gap-4">
           {images.map((image, index) => (
             <div className="w-1/4 hover:z-10">
