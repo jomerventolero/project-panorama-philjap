@@ -66,8 +66,7 @@ const Navbar = () => {
           <img src={logo} alt="Philjap Logo" className="w-[78px]"/>
         </a>
       </div>
-      <a href="/dashboard-admin" className="mx-auto">
-          
+      <a href="/dashboard-admin" className="mx-auto self-center">
           <span className='px-8 pt-4 font-medium text-white align-middle'>Engr. {firstName}</span>
       </a>
       <div className="flex flex-row gap-4 font-medium">

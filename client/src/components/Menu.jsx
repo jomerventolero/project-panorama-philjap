@@ -78,7 +78,7 @@ const Menu = ({logout}) => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 w-40 mt-2 bg-gray-900 rounded-lg shadow-xl bg-glass">
+        <div className="absolute right-0 w-40 mt-2 rounded-lg items-center shadow-xl bg-glass">
           <button className="flex items-center justify-start px-2 py-1 text-xl text-white hover:bg-gray-400 hover:rounded-l-lg hover:text-blue-500">
             <FaHome className="inline-block w-6 h-6 mr-2 align-text-top " />
             <span>Home</span>
