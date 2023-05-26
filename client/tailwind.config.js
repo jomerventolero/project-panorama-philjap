@@ -22,7 +22,8 @@ module.exports = {
         xl: "18px",
       },
       backgroundImage: {
-        "background": "url('src/assets/container.webp')"
+        "background": "url('src/assets/container.webp')",
+        "gradient": "url('src/assets/mesh-275.png')"
       }
     },
     screens: {
