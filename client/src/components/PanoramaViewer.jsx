@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Loader from './Loader';
 
-const PanoramaViewer = ({image}) => {
+const PanoramaViewer = ({ image }) => {
   const containerRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -15,7 +15,7 @@ const PanoramaViewer = ({image}) => {
 
     function init() {
       // Create a new camera object
-      camera = new THREE.PerspectiveCamera(100, (window.innerWidth / 2 - 20) / (window.innerHeight / 2 - 20), 1, 1000);
+      camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 1, 1000);
 
       // Set the camera position
       camera.position.set(0, 0, 0.1);
@@ -46,7 +46,7 @@ const PanoramaViewer = ({image}) => {
 
       // Create a new WebGL renderer object
       renderer = new THREE.WebGLRenderer();
-      renderer.setSize(window.innerWidth / 2 - 20, window.innerHeight / 2 - 20);
+      renderer.setSize(window.innerWidth, window.innerHeight);
 
       // Append the renderer to the container
       containerRef.current.appendChild(renderer.domElement);
@@ -66,13 +66,13 @@ const PanoramaViewer = ({image}) => {
 
     // Resize the renderer when the window size changes
     const handleResize = () => {
-      camera.aspect = (window.innerWidth / 2 - 20) / (window.innerHeight / 2 - 20);
+      camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth / 2 - 20, window.innerHeight / 2 - 20);
+      renderer.setSize(window.innerWidth, window.innerHeight);
     };
 
     window.addEventListener('resize', handleResize);
-    
+
     // Cleanup function in useEffect
     return () => {
       window.removeEventListener('resize', handleResize);
@@ -83,9 +83,27 @@ const PanoramaViewer = ({image}) => {
     };
   }, [image]);
 
+  const handleFullScreen = () => {
+    if (containerRef.current) {
+      if (containerRef.current.requestFullscreen) {
+        containerRef.current.requestFullscreen();
+      } else if (containerRef.current.mozRequestFullScreen) {
+        containerRef.current.mozRequestFullScreen();
+      } else if (containerRef.current.webkitRequestFullscreen) {
+        containerRef.current.webkitRequestFullscreen();
+      } else if (containerRef.current.msRequestFullscreen) {
+        containerRef.current.msRequestFullscreen();
+      }
+    }
+  };
+
   return (
-    <div ref={containerRef} style={{padding: 20, width: 'calc(60vw - 50px)', height: 'calc(60vh - 50px)', boxSizing: 'border-box'}}>
-      {isLoading && <Loader />}
+    <div>
+      <div ref={containerRef} className="rounded-xl" style={{ width: '100%', height: 'calc(100vh - 100px)' }}>
+        {isLoading && <Loader />}
+      </div>
+      <button onClick={handleFullScreen}
+       className="ml-10 mb-10 rounded-xl p-4 text-white bg-glass border-4 border-violet-500 hover:text-violet-500 font-medium">Fullscreen</button>
     </div>
   );
 };
