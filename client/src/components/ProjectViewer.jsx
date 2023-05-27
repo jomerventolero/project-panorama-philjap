@@ -62,16 +62,16 @@ const ProjectViewer = () => {
       <div className="pt-[150px] flex flex-col justify-center items-center">
         {selectedImage && <PanoramaViewer image={selectedImage} />}
       </div>
-      <div className="flex flex-row relative justify-center items-center h-full w-full py-2 pt-[50px] bg-slate-900">
-        <button className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white p-2 rounded-r-md shadow" onClick={handleScrollLeft}>
+      <div className="flex flex-row relative justify-center items-center h-full w-full px-2 pt-[50px] bg-slate-900">
+        <button className="absolute left-0 top-1/2 text-[32px] transform -translate-y-1/2 z-20 bg-white p-2 rounded-r-md shadow" onClick={handleScrollLeft}>
           &lt;
         </button>
-        <button className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white p-2 rounded-l-md shadow" onClick={handleScrollRight}>
+        <button className="absolute right-0 top-1/2 text-[32px] transform -translate-y-1/2 z-20 bg-white p-2 rounded-l-md shadow" onClick={handleScrollRight}>
           &gt;
         </button>
-        <div className="flex flex-row gap-4 mx-28 z-10 overflow-y-hidden scrollbar-thin" ref={imageContainerRef} style={{ scrollbarWidth: "none" }}>
+        <div className="flex flex-row gap-36 justify-between z-10 overflow-y-hidden scrollbar-thin" ref={imageContainerRef} style={{ scrollbarWidth: "none" }}>
           {images.map((image, index) => (
-            <div className={`w-1/4 hover:z-10 ${selectedImage === image.imageUrl ? "scale-105" : ""}`} key={index}>
+            <div className={`w-1/4 hover:z-10 ${selectedImage === image.imageUrl ? "" : ""}`} key={index}>
               <CardIndvComp image={image} onClick={() => handleCardClick(image.imageUrl)} />
             </div>
           ))}
