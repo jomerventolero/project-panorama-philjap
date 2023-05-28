@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import ProjectsList from './ProjectsList';
+import ProjectsList from '../components/ProjectsList';
 import axios from 'axios';
 
 jest.mock('axios');
