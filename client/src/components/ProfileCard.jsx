@@ -12,7 +12,7 @@ const ProfileCard = ({ user }) => {
   const getProfileUrl = (user) => {
     if (user && user.uid) {
       const storage = getStorage();
-      const storageRef = ref(storage, `profile/${user.uid}`);
+      const storageRef = ref(storage, `${user.profileUrl}`);
 
       getDownloadURL(storageRef)
         .then((downloadUrl) => {
@@ -28,16 +28,16 @@ const ProfileCard = ({ user }) => {
   };
 
   return (
-    <div className="max-w-sm mx-auto overflow-hidden rounded-lg shadow-lg cursor-pointer">
-      <div className="px-4 py-6 bg-white">
-        <img src={profileUrl} alt="Profile" className="w-32 h-32 mx-auto rounded-full" />
-        <h2 className="mt-4 text-2xl font-bold text-center">{user ? user.firstName : ''}</h2>
-        <p className="text-center text-gray-600">{user ? user.lastName : ''}</p>
+      <div className="max-w-xl px-4 mx-auto overflow-hidden rounded-lg shadow-lg cursor-pointer hover:bg-gray-600 bg-glass">
+        <div className="px-4 py-6">
+          <img src={profileUrl} alt="Profile" className="w-32 h-32 mx-auto rounded-full" />
+          <h2 className="mt-4 text-2xl font-bold text-center text-white">{user ? user.firstName : ''}</h2>
+          <p className="text-center text-gray-400">Engr. {user ? user.lastName : ''}</p>
+        </div>
+        <div className="px-4 py-3">
+          <p className="text-gray-700">{user ? user.bday : ''}</p>
+        </div>
       </div>
-      <div className="px-4 py-3 bg-gray-100">
-        <p className="text-gray-700">{user ? user.bday : ''}</p>
-      </div>
-    </div>
   );
 };
 
