@@ -1,6 +1,6 @@
 [
     {
-        "origin": ["http://localhost:5173", "https://philjaps.vercel.app"],
+        "origin": ["http://localhost:5173", "http://localhost:5174", "https://8gvckpm9-5174.asse.devtunnels.ms/", "https://philjaps.vercel.app"],
         "method": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "maxAgeSeconds": 3600
     }
