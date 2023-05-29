@@ -1,17 +1,22 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import CardIndvComp from './CardIndvComp';
 import PanoramaViewer from './PanoramaViewer';
 import { auth } from '../firebase/auth';
 import Navbar from './Navbar';
 
+
+
 const ProjectViewer = () => {
   const { projectId } = useParams();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const [projectTitle, setProjectTitle] = useState('');
+
   const [images, setImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [userId, setUserId] = useState(null);
-
   const imageContainerRef = useRef(null);
   const scrollStep = 400; // Number of pixels to scroll
 
@@ -20,6 +25,7 @@ const ProjectViewer = () => {
       try {
         // Get the current user's userId
         const user = auth.currentUser;
+        
         if (user) {
           const userIdCurrent = user.uid;
           setUserId(userIdCurrent);
@@ -27,6 +33,13 @@ const ProjectViewer = () => {
           // Fetch the project images using the userId
           const response = await axios.get(`http://localhost:3002/api/projects/images/${projectId}/${userIdCurrent}`);
           setImages(response.data.images);
+
+          // Get project title from URL
+          const searchParams = new URLSearchParams(location.search);
+          const projectTitleFromUrl = searchParams.get('projectTitle');
+          if (projectTitleFromUrl) {
+            setProjectTitle(decodeURIComponent(projectTitleFromUrl));
+          }
         } else {
           // handle case where no user is signed in
           console.error("No user signed in");
@@ -37,7 +50,8 @@ const ProjectViewer = () => {
     };
   
     fetchData();
-  }, [projectId]);
+  }, [projectId, location.search]);
+
   
 
   const handleCardClick = async (imageUrl) => {
@@ -60,6 +74,7 @@ const ProjectViewer = () => {
     <div className="h-[500px]">
       <Navbar />
       <div className="pt-[150px] flex flex-col justify-center items-center">
+        <h1>{projectTitle}</h1>
         {selectedImage && <PanoramaViewer image={selectedImage} />}
       </div>
       <div className="flex flex-row relative justify-center items-center h-full w-full px-2 pt-[50px] bg-slate-900">

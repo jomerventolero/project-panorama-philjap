@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaHome, FaUser, FaBars } from 'react-icons/fa';
+import { FaTruckLoading } from 'react-icons/fa';
 import logout_img from "../assets/logout.png"
 import { auth } from '../firebase/auth';
 import axios from 'axios';
@@ -78,22 +78,18 @@ const Menu = ({logout}) => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 w-40 mt-2 rounded-lg items-center shadow-xl bg-glass">
-          <button className="flex items-center justify-start px-2 py-1 text-xl text-white hover:bg-gray-400 hover:rounded-l-lg hover:text-blue-500">
-            <FaHome className="inline-block w-6 h-6 mr-2 align-text-top " />
-            <span>Home</span>
-          </button>
-          <button className="flex items-center justify-start px-2 py-1 text-xl text-white hover:bg-gray-400 hover:text-blue-500 hover:rounded-l-lg">
-            <FaUser className="inline-block w-6 h-6 mr-2 align-text-top"  />
-            <span>Profile</span>
-          </button>
-          <button 
-            className="flex items-center justify-start px-2 py-1 text-xl text-white hover:bg-gray-400 hover:rounded-l-lg hover:text-blue-500"
+        <div className="absolute right-0 items-center w-40 mt-2 rounded-lg shadow-xl bg-glass">
+          <a href="/dashboard-admin" className="flex items-center justify-start px-2 py-1 text-xl text-white hover:bg-gray-400 hover:rounded-lg hover:text-blue-500">
+            <FaTruckLoading className="inline-block w-6 h-6 mr-2 align-text-top " />
+            <span>Reload</span>
+          </a>
+          <a
+            className="flex items-center justify-start px-2 py-1 text-xl text-white cursor-pointer hover:bg-gray-400 hover:rounded-lg hover:text-blue-500"
             onClick={handleLogout}
           >
             <img src={logout_img} className="inline-block w-6 h-6 mr-2 align-text-top" /> 
             <span>Logout</span>
-          </button>
+          </a>
         </div>
       )}
     </div>
