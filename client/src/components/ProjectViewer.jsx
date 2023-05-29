@@ -57,7 +57,7 @@ const ProjectViewer = () => {
   };
 
   return (
-    <div>
+    <div className="h-[500px]">
       <Navbar />
       <div className="pt-[150px] flex flex-col justify-center items-center">
         {selectedImage && <PanoramaViewer image={selectedImage} />}
@@ -69,7 +69,9 @@ const ProjectViewer = () => {
         <button className="absolute right-0 top-1/2 text-[32px] transform -translate-y-1/2 z-20 bg-white p-2 rounded-l-md shadow" onClick={handleScrollRight}>
           &gt;
         </button>
+        
         <div className="z-10 flex flex-row justify-between overflow-y-hidden gap-36 scrollbar-thin" ref={imageContainerRef} style={{ scrollbarWidth: "none" }}>
+          
           {images.map((image, index) => (
             <div className={`w-1/4 hover:z-10 ${selectedImage === image.imageUrl ? "" : ""}`} key={index}>
               <CardIndvComp image={image} onClick={() => handleCardClick(image.imageUrl)} />

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Skeleton from 'react-loading-skeleton';
 import axios from 'axios';
 import CardComponent from './CardComponent';
+import { set } from 'react-hook-form';
 
 const ProjectsList = ({ userId }) => {
   const [projects, setProjects] = useState([]);
@@ -29,8 +30,9 @@ const ProjectsList = ({ userId }) => {
     fetchData();
   }, [userId]);
 
-  const handleCardClick = (projectId) => {
-    navigate(`/projects/${projectId}?userId=${userId}`);
+  const handleCardClick = (projectId, projectTitle) => {
+    
+    navigate(`/projects/${projectId}?userId=${userId}?projectTitle=${projectTitle}`);
   };
 
   if (isLoading) {
@@ -53,7 +55,7 @@ const ProjectsList = ({ userId }) => {
   return (
     <div className="z-40 flex justify-center h-full gap-8 py-2 flex-nowrap">
       {projects.map((project, index) => (
-        <CardComponent key={index} project={project} onClick={() => handleCardClick(project.id)} />
+        <CardComponent key={index} project={project} onClick={() => handleCardClick(project.id, project.title)} />
       ))}
     </div>
   );
