@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import Skeleton from 'react-loading-skeleton';
 import axios from 'axios';
 import CardComponent from './CardComponent';
-import { set } from 'react-hook-form';
 
 const ProjectsList = ({ userId }) => {
   const [projects, setProjects] = useState([]);

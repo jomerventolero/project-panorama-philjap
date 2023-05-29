@@ -12,7 +12,7 @@ import upload from '../assets/upload.png'
 import chat from '../assets/chat.png'
 import Menu from './Menu'
 
-const Navbar = () => {
+const ClientNavbar = () => {
   const [firstName, setFirstName] = useState(null);
   const [user, setUser] = useState(null);
   const [profileUrl, setProfileUrl] = useState('');
@@ -66,17 +66,10 @@ const Navbar = () => {
           <img src={logo} alt="Philjap Logo" className="w-[78px]"/>
         </a>
       </div>
-      <a href="/dashboard-admin" className="self-center mx-auto">
-          <span className='px-8 pt-4 font-medium text-white align-middle'>Engr. {firstName}</span>
+      <a href="/dashboard-user" className="self-center mx-auto">
+          <span className='px-8 pt-4 font-medium text-white align-middle'>Hello {firstName} 👋</span>
       </a>
-      <div className="flex flex-row gap-4 font-medium">
-        <a href="/chat">
-          <img src={chat} alt="chat" className="w-[48px] pt-1 self-center align-middle"/>
-        </a>
-        <a href="/upload">
-          <img src={upload} alt="upload" className="w-[48px] pt-1 self-center align-middle"/>
-        </a>
-        
+      <div className="flex flex-row gap-4 font-medium">       
         {user ? 
           ( <Menu logout={logout} /> ) : 
           ( null )
@@ -86,4 +79,4 @@ const Navbar = () => {
   )
 }
 
-export default Navbar;
+export default ClientNavbar;
