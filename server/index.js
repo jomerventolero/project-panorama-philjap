@@ -417,6 +417,44 @@ retrieving */
   });
   
 
+  // Route to send an email
+  app.post('/send-email', (req, res) => {
+    const { to, subject, text } = req.body;
+
+    // Create a Nodemailer transporter using the mock SMTP transport
+    const transporter = nodemailer.createTransport({
+      // Use the nodemailer-mock transport to simulate sending emails
+      // You can replace this with your actual mail server configuration
+      host: 'smtp.ethereal.email',
+      port: 587,
+      auth: {
+        user: 'test@example.com',
+        pass: 'testpassword',
+      },
+    });
+
+    // Define the email options
+    const mailOptions = {
+      from: 'Your Name <yourname@example.com>',
+      to,
+      subject,
+      text,
+    };
+
+    // Send the email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+        res.status(500).json({ error: 'An error occurred while sending the email' });
+      } else {
+        console.log('Email sent:', info.response);
+        res.json({ message: 'Email sent successfully' });
+      }
+    });
+  });
+
+
+
   app.get('/test', (req, res) => {
     res.send('Success!');
   });   
