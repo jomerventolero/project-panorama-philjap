@@ -31,7 +31,7 @@ const ClientProjectView = () => {
     };
 
     fetchData();
-  }, [userId]);
+  }, []);
 
   useEffect(() => {
     const fetchFirstName = async () => {
