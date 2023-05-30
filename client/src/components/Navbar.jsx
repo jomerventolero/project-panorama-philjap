@@ -70,9 +70,6 @@ const Navbar = () => {
           <span className='px-8 pt-4 font-medium text-white align-middle'>Engr. {firstName}</span>
       </a>
       <div className="flex flex-row gap-4 font-medium">
-        <a href="/chat">
-          <img src={chat} alt="chat" className="w-[48px] pt-1 self-center align-middle"/>
-        </a>
         <a href="/upload">
           <img src={upload} alt="upload" className="w-[48px] pt-1 self-center align-middle"/>
         </a>
