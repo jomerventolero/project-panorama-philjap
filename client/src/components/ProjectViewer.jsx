@@ -23,9 +23,11 @@ const ProjectViewer = () => {
         const userIdFromUrl = searchParams.get('userId');
         setUserId(userIdFromUrl);
 
-        // Fetch the project images using the userId
-        const response = await axios.get(`http://localhost:3002/api/projects/images/${projectId}/${userIdFromUrl}`);
-        setImages(response.data.images);
+        if (userIdFromUrl) {
+          // Fetch the project images using the userId
+          const response = await axios.get(`http://localhost:3002/api/projects/images/${projectId}/${userIdFromUrl}`);
+          setImages(response.data.images);
+        }
 
         // Get project title from URL
         const projectTitleFromUrl = searchParams.get('projectTitle');
@@ -55,6 +57,11 @@ const ProjectViewer = () => {
       imageContainerRef.current.scrollLeft += scrollStep;
     }
   };
+
+  // Check if userIdFromUrl exists before rendering the component
+  if (!userId) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="h-[500px]">
