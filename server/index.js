@@ -4,7 +4,7 @@
    const express = require('express');
    const cors = require('cors');
    const admin = require('firebase-admin');
-   const serviceAccount = require('./firebase-config/philjaps-firebase-adminsdk-asmoe-c066ae76b2.json');
+   const serviceAccount = require('./firebase-config/philjaps-prod-firebase-adminsdk-g5s8r-1610e21e1c.json');
    const uuid = require('uuid');
 
    const app = express();
