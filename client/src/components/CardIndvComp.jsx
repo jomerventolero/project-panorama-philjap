@@ -10,7 +10,7 @@ const CardIndvComp = ({ image, onClick }) => {
           
           <div className="flex flex-row justify-between text-xl font-semibold tracking-wide text-indigo-500 uppercase">
             {image.imageTitle}
-            <button className="rounded-full text-white bg-slate-500 hover:bg-sky-500 p-2">View</button>
+            <button className="rounded-full text-white px-4 bg-slate-500 hover:bg-sky-500 p-2">View</button>
           </div>
         </div>
       ) : (

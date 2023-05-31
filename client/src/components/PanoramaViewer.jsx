@@ -103,7 +103,7 @@ const PanoramaViewer = ({ image }) => {
         {isLoading && <Loader />}
       </div>
       <button onClick={handleFullScreen}
-       className="ml-10 mb-10 rounded-xl p-4 text-white bg-glass border-4 border-violet-500 hover:text-violet-500 font-medium">Fullscreen</button>
+       className="ml-10 mb-10 rounded-xl p-4 text-white bg-slate-500 border-2 hover:bg-sky-500 font-medium">Fullscreen</button>
     </div>
   );
 };
