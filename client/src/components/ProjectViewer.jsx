@@ -40,7 +40,7 @@ const ProjectViewer = () => {
     };
 
     fetchData();
-  }, [projectId, searchParams]);
+  }, []);
 
   const handleCardClick = (imageUrl) => {
     setSelectedImage(imageUrl);

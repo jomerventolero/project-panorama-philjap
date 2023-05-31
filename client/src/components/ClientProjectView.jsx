@@ -16,22 +16,23 @@ const ClientProjectView = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (userId !== null) {
-        try {
+      try {
+        if (projects.length === 0) {
           const response = await axios.get(`http://localhost:3002/api/projects/${userId}`);
           setProjects(response.data);
           setIsLoading(false);
-        } catch (error) {
-          setError(error.message);
-          setIsLoading(false);
         }
-      } else {
+      } catch (error) {
+        setError(error.message);
         setIsLoading(false);
       }
     };
-
-    fetchData();
-  }, []);
+  
+    if (userId) {
+      fetchData();
+    }
+  }, [userId]);
+  
 
   useEffect(() => {
     const fetchFirstName = async () => {
