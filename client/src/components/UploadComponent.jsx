@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useForm, useFieldArray } from 'react-hook-form';
 
@@ -8,31 +8,44 @@ const UploadComponent = ({ userId }) => {
       images: [{ imageTitle: '', imageDescription: '', imageFile: null }],
     },
   });
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'images',
   });
 
+  const [formFields, setFormFields] = useState(fields);
+
   const onSubmit = async (data) => {
     const formData = new FormData();
-
+  
     data.images.forEach((img, index) => {
       formData.append(`images[${index}][title]`, img.imageTitle);
       formData.append(`images[${index}][description]`, img.imageDescription);
-      formData.append(`images[${index}][file]`, img.imageFile[0]);
+      if (img.imageFile && img.imageFile[0]) {
+        formData.append(`images[${index}][file]`, img.imageFile[0]);
+      }
     });
-
+  
     formData.append('uid', userId);
     formData.append('title', data.title);
     formData.append('description', data.description);
-
+  
     const response = await axios.post('http://localhost:3002/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-
+  
     console.log(response.data);
+  };
+  
+
+  const handleFileChange = (e, index) => {
+    const file = e.target.files[0];
+    const updatedFields = [...formFields];
+    updatedFields[index].imageFile = file;
+    setFormFields(updatedFields);
   };
 
   return (
@@ -62,7 +75,7 @@ const UploadComponent = ({ userId }) => {
           />
         </div>
 
-        {fields.map((item, index) => (
+        {formFields.map((item, index) => (
           <fieldset key={item.id} className="mb-4">
             <div className="mb-2">
               <label className="block mb-2 text-sm font-bold text-gray-300">
@@ -82,7 +95,7 @@ const UploadComponent = ({ userId }) => {
               </label>
               <input 
                 type="file" 
-                {...register(`images.${index}.imageFile`)} 
+                onChange={(e) => handleFileChange(e, index)}
                 required 
                 className="w-full px-3 py-2 leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
               />

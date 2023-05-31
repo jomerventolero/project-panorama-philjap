@@ -24,18 +24,18 @@
 
    const bucket = admin.storage().bucket();
 
-   /* The code is configuring and initializing a multer middleware for handling file uploads in a
-   Node.js application. It sets the storage engine to use in-memory storage, and sets limits for the
-   maximum number of files and the maximum file size that can be uploaded. Specifically, it allows
-   up to 15 files to be uploaded, with each file having a maximum size of 50 MB. */
-   // set multer to store files temporarily on disk
-  // Set up storage engine
-  let storage = multer.diskStorage({
+
+  // Set up multer storage engine
+  /* The above code is setting up a disk storage engine for Multer, a middleware for handling file
+  uploads in Node.js. It specifies the destination directory where uploaded files will be stored and
+  sets the filename for the uploaded file to include the original fieldname, the current date and
+  time, and the original file extension. */
+  const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, './uploads'); // the path where the uploaded files will be stored. Make sure this directory exists.
+      cb(null, './uploads'); // Specify the directory where uploaded files will be stored
     },
     filename: function (req, file, cb) {
-      cb(null, file.fieldname + '-' + Date.now()); // sets the name of the file that will be saved.
+      cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname)); // Set the filename for the uploaded file
     },
   });
    
@@ -79,27 +79,29 @@
     }
   };
    
+  // Set up multer middleware
   const upload = multer({
-    storage: multer.diskStorage({
-      destination: 'uploads/',
-      filename: function (req, file, cb) {
-        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
-      }
-    }),
-    limits: { fileSize: 15000000 }, // In bytes: 2000000 bytes = 15 MB
+    storage: storage,
+    limits: { fileSize: 15 * 1024 * 1024 }, // Limit the file size to 15MB
     fileFilter: function (req, file, cb) {
-      checkFileType(file, cb);
-    }
+      // Validate the file type if needed
+      // For example, to only allow image files, you can check the MIME type or file extension
+      if (file.mimetype.startsWith('image/')) {
+        cb(null, true); // Accept the file
+      } else {
+        cb(new Error('Invalid file type. Only image files are allowed.')); // Reject the file
+      }
+    },
   });
   
 
-/* The above code is defining a route for the "/user" endpoint in an Express app. The route is
-protected by a Firebase authentication middleware called "validateFirebaseIdToken". When a GET
-request is made to this endpoint, the code retrieves the user data from a Firestore database using
-the user ID from the Firebase authentication token. If the user document does not exist, a 404 error
-is returned. If the user document exists but does not have a "firstName" field, a 404 error is
-returned. Otherwise, the user's first name is returned in the response. If there is an error
-retrieving */
+  /* The code below is defining a route for the "/user" endpoint in an Express app. The route is
+  protected by a Firebase authentication middleware called "validateFirebaseIdToken". When a GET
+  request is made to this endpoint, the code retrieves the user data from a Firestore database using
+  the user ID from the Firebase authentication token. If the user document does not exist, a 404 error
+  is returned. If the user document exists but does not have a "firstName" field, a 404 error is
+  returned. Otherwise, the user's first name is returned in the response. If there is an error
+  retrieving */
   app.get('/user', validateFirebaseIdToken, async (req, res) => {
     try {
       const userSnapshot = await db
@@ -179,61 +181,38 @@ retrieving */
   });
 
 
-  /* The code below is a server-side code written in JavaScript using the Express framework. It defines
-  a route for handling file uploads to Google Cloud Storage and Firestore. When a POST request is
-  made to the '/upload' endpoint, it expects a multipart form data with an array of images, a title,
-  and a description. It then generates a unique project ID using the uuid library, creates a Promise
-  for each image file, and uploads it to Google Cloud Storage using the Google Cloud Storage Node.js
-  client library. Once the upload is complete, it creates an image record with the image ID, title,
-  description, */
-  app.post('/upload', upload.array('images'), async (req, res) => {
+  // Route for handling file uploads
+  app.post('/upload', upload.single('image'), async (req, res) => {
     try {
-      const { title, description } = req.body;
-      const projectId = uuid.v4();
-  
-      const imagesPromises = req.files.map((file) => {
-        const id = uuid.v4();
-        const blob = bucket.file(`images/project/${req.body.uid}/${title}/${id}.jpg`);
-        
-        const blobWriter = blob.createWriteStream({
-          metadata: {
-            contentType: file.mimetype,
-          },
-        });
-  
-        return new Promise((resolve, reject) => {
-          blobWriter.on('error', reject);
-          blobWriter.on('finish', async () => {
-            const imageUrl = `gs://${bucket.name}/${blob.name}`;
-            const imageRecord = {
-              id,
-              imageTitle: title,
-              imageDescription: description,
-              imageUrl,
-            };
-  
-            resolve(imageRecord);
-          });
-  
-          fs.createReadStream(file.path).pipe(blobWriter);
-        });
+      // Access the uploaded file using req.file
+      const file = req.file;
+
+      // Check if a file was uploaded
+      if (!file) {
+        return res.status(400).json({ message: 'No file uploaded' });
+      }
+
+      // Upload the file to Firebase Storage
+      const filename = file.filename;
+      const filePath = `images/${filename}`;
+      await bucket.upload(file.path, {
+        destination: filePath,
+        metadata: {
+          contentType: file.mimetype,
+        },
       });
-  
-      const images = await Promise.all(imagesPromises);
-  
-      const projectData = {
-        id: projectId,
-        title,
-        description,
-        images,
-      };
-  
-      const docRef = db.collection('projects').doc(projectId);
-      await docRef.set(projectData);
-  
-      res.status(200).send(projectData);
-    } catch (err) {
-      res.status(500).send(err.message);
+
+      // Construct the public URL for the uploaded file
+      const publicUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
+
+      // Respond with the file information
+      res.json({
+        filename: file.originalname,
+        url: publicUrl,
+      });
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      res.status(500).json({ message: 'Error uploading file' });
     }
   });
 
