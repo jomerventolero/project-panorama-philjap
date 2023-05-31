@@ -148,6 +148,7 @@ retrieving */
         lastName: lastName,
         birthday: bday,
         isAdmin: isAdmin,
+        email: email,
       });   
       if (isAdmin) {
         // Create a dedicated folder for the admin user in Firebase Storage
