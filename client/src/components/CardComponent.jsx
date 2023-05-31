@@ -30,7 +30,7 @@ const CardComponent = ({ project, onClick }) => {
         <div className="p-8 flex flex-col justify-center items-center">
           <div className="font-semibold tracking-wide text-indigo-500 uppercase text-md">{project.title}</div>
           <p className="mt-2 text-sm text-left text-white">{project.description}</p>
-          <button className="p-2 m-2 bg-glass w-1/2 rounded-full text-white" onClick={onClick}>Open</button>
+          <button className="p-2 m-2 hover:bg-sky-500 bg-glass w-1/2 rounded-full text-white" onClick={onClick}>Open</button>
         </div>
       </div>
     </div>

@@ -7,7 +7,11 @@ const CardIndvComp = ({ image, onClick }) => {
       {image ? (
         <div className="px-4 pt-2 pb-4">
           <img className="object-cover w-full h-48 mb-2 rounded-xl" src={image.imageUrl} alt={image.imageTitle} />
-          <div className="text-xl font-semibold tracking-wide text-indigo-500 uppercase">{image.imageTitle}</div>
+          
+          <div className="flex flex-row justify-between text-xl font-semibold tracking-wide text-indigo-500 uppercase">
+            {image.imageTitle}
+            <button className="rounded-full text-white bg-slate-500 hover:bg-sky-500 p-2">View</button>
+          </div>
         </div>
       ) : (
         <div className="p-4">
