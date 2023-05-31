@@ -18,7 +18,7 @@ const ProjectsList = ({ userId }) => {
           setProjects(response.data);
           setIsLoading(false);
         } catch (error) {
-          setError(error.message);
+          setError(" No Projects Found");
           setIsLoading(false);
         }
       } else {
