@@ -36,7 +36,7 @@ const UploadComponent = ({ userId }) => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen text-white bg-gray-900">
+    <div className="flex items-center justify-center min-h-screen text-white bg-slate-900">
       <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md p-8 bg-glass">
         <div className="mb-4">
           <label className="block mb-2 text-sm font-bold text-gray-300">
@@ -105,7 +105,7 @@ const UploadComponent = ({ userId }) => {
         <div className="flex items-center justify-center mt-4">
           <button 
             type="submit"
-            className="px-4 py-2 w-3/4 font-bold text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:shadow-outline"
+            className="w-3/4 px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:shadow-outline"
           >
             Upload
           </button>
