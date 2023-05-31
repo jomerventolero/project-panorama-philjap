@@ -36,7 +36,7 @@ const ProfileCard = ({ user, onUserClick }) => {
         </div>
         <div className="flex flex-col justify-center p-2 items-center">
           <p className="mt-2 text-blue-500">{user ? user.email : ''}</p>
-          <button className="p-1 bg-glass rounded-full text-white" onClick={onUserClick}>Goto {user.firstName} Profile</button>
+          <button className="px-4 py-2 my-4 bg-glass hover:bg-sky-500 rounded-full text-slate-200" onClick={onUserClick}>Goto {user.firstName} Profile</button>
         </div>
       </div>
   );
