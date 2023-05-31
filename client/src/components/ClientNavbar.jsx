@@ -2,21 +2,17 @@ import React from 'react'
 import logo from '../assets/logo.png'
 
 
-import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 import { useState, useEffect } from 'react'
-import { auth, app } from '../firebase/auth'
+import { auth } from '../firebase/auth'
 
 
 import axios from 'axios'
-import upload from '../assets/upload.png'
-import chat from '../assets/chat.png'
+
 import Menu from './Menu'
 
 const ClientNavbar = () => {
   const [firstName, setFirstName] = useState(null);
   const [user, setUser] = useState(null);
-  const [profileUrl, setProfileUrl] = useState('');
-  const storage = getStorage();
 
   const logout = () => {
     auth.signOut()

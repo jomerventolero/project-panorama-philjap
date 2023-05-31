@@ -1,14 +1,52 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import emailjs from 'emailjs-com';
 import classnames from 'classnames';
+import { firestore, auth } from '../firebase/auth';
 
-const EmailForm = () => {
+const EmailForm = ({ userId }) => {
   const [to, setTo] = useState('');
   const [subject, setSubject] = useState('');
   const [text, setText] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [isSent, setIsSent] = useState(false);
   const [error, setError] = useState(null);
+  const [senderName, setSenderName] = useState('');
+
+  useEffect(() => {
+    const fetchReceiverEmail = async () => {
+      try {
+        const userDoc = await firestore.collection('users').doc(userId).get();
+        const userData = userDoc.data();
+        if (userData && userData.email) {
+          setTo(userData.email);
+        }
+      } catch (error) {
+        console.error('Error fetching receiver email:', error);
+      }
+    };
+
+    if (userId) {
+      fetchReceiverEmail();
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    const fetchSenderName = async () => {
+      try {
+        const userDoc = await firestore.collection('users').doc(auth.currentUser.uid).get();
+        const userData = userDoc.data();
+        if (userData && userData.firstName) {
+          setSenderName(userData.firstName);
+        }
+      } catch (error) {
+        console.error('Error fetching sender name:', error);
+      }
+    };
+
+    if (auth.currentUser) {
+      fetchSenderName();
+    }
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -26,11 +64,12 @@ const EmailForm = () => {
     setIsSending(true);
 
     try {
-      await axios.post('http://localhost:3002/send-email', {
-        to,
+      await emailjs.send('service_zjcigin', 'template_ft1grju', {
+        to_email: to,
+        from_name: senderName,
         subject,
-        text,
-      });
+        message: text,
+      }, '4b35hCQFivBvVPHWY');
       setIsSent(true);
       setError(null);
     } catch (error) {
@@ -88,10 +127,9 @@ const EmailForm = () => {
         </div>
         <button
           type="submit"
-          className={classnames(
-            'bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded',
-            { 'opacity-50 cursor-not-allowed': isSending }
-          )}
+          className={classnames('bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded', {
+            'opacity-50 cursor-not-allowed': isSending,
+          })}
           disabled={isSending}
         >
           {isSending ? 'Sending...' : 'Send Email'}

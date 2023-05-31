@@ -5,8 +5,8 @@
    const cors = require('cors');
    const admin = require('firebase-admin');
    const serviceAccount = require('./firebase-config/philjaps-prod-firebase-adminsdk-g5s8r-1610e21e1c.json');
+   const bodyParser = require('body-parser');
    const uuid = require('uuid');
-   const nodemailer = require('nodemailer');
 
 
    const app = express();
@@ -23,7 +23,6 @@
    const multer = require('multer');
 
    const bucket = admin.storage().bucket();
-   
 
    /* The code is configuring and initializing a multer middleware for handling file uploads in a
    Node.js application. It sets the storage engine to use in-memory storage, and sets limits for the
@@ -418,44 +417,6 @@ retrieving */
     }
   });
   
-
-  // Route to send an email
-  app.post('/send-email', (req, res) => {
-    const { to, subject, text } = req.body;
-
-    // Create a Nodemailer transporter using the mock SMTP transport
-    const transporter = nodemailer.createTransport({
-      // Use the nodemailer-mock transport to simulate sending emails
-      // You can replace this with your actual mail server configuration
-      host: 'smtp.ethereal.email',
-      port: 587,
-      auth: {
-        user: 'test@example.com',
-        pass: 'testpassword',
-      },
-    });
-
-    // Define the email options
-    const mailOptions = {
-      from: 'Your Name <yourname@example.com>',
-      to,
-      subject,
-      text,
-    };
-
-    // Send the email
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error('Error sending email:', error);
-        res.status(500).json({ error: 'An error occurred while sending the email' });
-      } else {
-        console.log('Email sent:', info.response);
-        res.json({ message: 'Email sent successfully' });
-      }
-    });
-  });
-
-
 
   app.get('/test', (req, res) => {
     res.send('Success!');
