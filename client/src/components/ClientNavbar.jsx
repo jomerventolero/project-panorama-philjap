@@ -60,7 +60,7 @@ const ClientNavbar = () => {
 
 
   return (
-    <div className="fixed top-0 z-50 flex flex-row justify-between w-full gap-2 px-2 py-2 bg-slate-900">
+    <div className="fixed top-0 z-50 flex flex-row justify-between w-full gap-2 px-2 py-2 bg-glassNav">
       <div className="flex flex-row gap-4">
         <a className="" href="/dashboard-admin">
           <img src={logo} alt="Philjap Logo" className="w-[78px]"/>
