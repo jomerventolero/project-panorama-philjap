@@ -29,13 +29,14 @@ const ProfileCard = ({ user }) => {
 
   return (
       <div className="max-w-xl px-4 mx-auto overflow-hidden rounded-lg shadow-lg cursor-pointer hover:bg-gray-600 bg-glass">
-        <div className="px-4 py-6">
+        <div className="px-4 py-2">
           <img src={profileUrl} alt="Profile" className="w-32 h-32 mx-auto rounded-full" />
-          <h2 className="mt-4 text-2xl font-bold text-center text-white">{user ? user.firstName : ''}</h2>
-          <p className="text-center text-gray-400">Engr. {user ? user.lastName : ''}</p>
+          <h2 className="mt-4 text-2xl font-bold text-center text-white">Engr. {user ? user.firstName : ''}</h2>
+          <p className="text-center text-gray-400"> {user ? user.lastName : ''}</p>
         </div>
-        <div className="px-4 py-3">
-          <p className="text-gray-700">{user ? user.bday : ''}</p>
+        <div className="flex flex-col items-center">
+          <p className="mt-2 text-blue-500">{user ? user.email : ''}</p>
+          <p className="mt-2 text-sm text-gray-500">Click here to see <br/>{user.firstName} Portfolio</p>
         </div>
       </div>
   );

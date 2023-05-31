@@ -1,9 +1,12 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import CardIndvComp from './CardIndvComp';
 import PanoramaViewer from './PanoramaViewer';
+import Navbar from './Navbar';
 import ClientNavbar from './ClientNavbar';
+import { firestore } from '../firebase/auth';
 
 const ProjectViewer = () => {
   const { projectId } = useParams();
@@ -13,6 +16,7 @@ const ProjectViewer = () => {
   const [images, setImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const imageContainerRef = useRef(null);
   const scrollStep = 400; // Number of pixels to scroll
 
@@ -22,6 +26,13 @@ const ProjectViewer = () => {
         // Get the userId from the URL
         const userIdFromUrl = searchParams.get('userId');
         setUserId(userIdFromUrl);
+
+        // Fetch the user's data from Firestore to determine if they are an admin
+        const userDoc = await firestore.collection('users').doc(userIdFromUrl).get();
+        const userData = userDoc.data();
+        if (userData && userData.isAdmin) {
+          setIsAdmin(true);
+        }
 
         if (userIdFromUrl) {
           // Fetch the project images using the userId
@@ -65,7 +76,7 @@ const ProjectViewer = () => {
 
   return (
     <div className="h-[500px]">
-      <ClientNavbar />
+      {isAdmin ? <ClientNavbar /> : <Navbar />}
       <div className="pt-[150px] flex flex-col justify-center items-center">
         <h1 className="text-xl font-bold text-white">{projectTitle}</h1>
         {selectedImage && <PanoramaViewer image={selectedImage} />}

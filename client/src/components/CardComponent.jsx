@@ -29,7 +29,7 @@ const CardComponent = ({ project, onClick }) => {
         </div>
         <div className="p-8">
           <div className="font-semibold tracking-wide text-indigo-500 uppercase text-md">{project.title}</div>
-          <p className="mt-2 text-sm text-justify text-white">{project.description}</p>
+          <p className="mt-2 text-sm text-left text-white">{project.description}</p>
         </div>
       </div>
     </div>

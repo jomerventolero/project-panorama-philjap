@@ -32,7 +32,8 @@ const Explorer = () => {
   };
 
   return (
-    <div>
+    <div className="flex flex-col-reverse items-center justify-center gap-8 p-8">
+      <h1 className="items-center font-medium text-dimWhite">Explore our Engineers Portfolio</h1>
       <div className="grid grid-cols-3 gap-4 pt-10">
         {adminUsers.map((user) => (
           <div key={user.uid} onClick={() => handleProfileCardClick(user)} className="cursor-pointer">

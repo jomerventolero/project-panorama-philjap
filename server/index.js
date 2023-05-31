@@ -13,7 +13,7 @@
    
    admin.initializeApp({
      credential: admin.credential.cert(serviceAccount),
-     storageBucket: 'philjaps.appspot.com',
+     storageBucket: 'philjaps-prod.appspot.com',
    });
    
    const auth = admin.auth();
@@ -85,7 +85,7 @@
         cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
       }
     }),
-    limits: { fileSize: 2000000 }, // In bytes: 2000000 bytes = 2 MB
+    limits: { fileSize: 15000000 }, // In bytes: 2000000 bytes = 15 MB
     fileFilter: function (req, file, cb) {
       checkFileType(file, cb);
     }
@@ -284,7 +284,7 @@ retrieving */
         const imageData = imageDoc.data();
         const { imageUrl, imageTitle, imageDescription } = imageData;
   
-        const fileName = imageUrl.replace('gs://philjaps.appspot.com/', ''); // Replace with your bucket URL
+        const fileName = imageUrl.replace('gs://philjaps-prod.appspot.com/', ''); // Replace with your bucket URL
         const file = bucket.file(fileName);
   
         // Create a signed URL for the file
