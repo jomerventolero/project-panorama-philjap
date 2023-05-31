@@ -36,10 +36,7 @@ const RegistrationForm = () => {
     <div className="max-w-lg mx-auto">
       <form onSubmit={handleRegister} className="px-8 pt-6 pb-8 mb-4 bg-transparent rounded shadow-md">
         <h2 className="mb-6 text-2xl font-medium text-center text-white">Register</h2>
-        {error && <div className="relative px-4 py-3 mb-4 text-red-700 bg-red-100 border border-red-400 rounded" role="alert">
-          <strong className="font-bold">Error: </strong>
-          <span className="block sm:inline">{error}</span>
-        </div>}
+        
         <div className="mb-4">
           <label className="block mb-2 font-bold text-gray-700" htmlFor="email">
             Email Address
