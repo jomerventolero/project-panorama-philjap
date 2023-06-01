@@ -78,17 +78,7 @@
     }
   };
    
-  const upload = multer({
-    storage: storage,
-    limits: { fileSize: 15 * 1024 * 1024 },
-    fileFilter: function (req, file, cb) {
-      if (file.mimetype.startsWith('image/')) {
-        cb(null, true);
-      } else {
-        cb(new Error('Invalid file type. Only image files are allowed.'));
-      }
-    },
-  }).single('image'); 
+  const upload = multer({ storage: multer.memoryStorage() });
   
 
   /* The code below is defining a route for the "/user" endpoint in an Express app. The route is
@@ -177,43 +167,37 @@
   });
 
 
-  app.post('/upload', (req, res) => {
-    upload(req, res, async (error) => {
-      if (error instanceof multer.MulterError) {
-        // A Multer error occurred during file upload
-        console.error('Multer error:', error);
-        return res.status(500).json({ message: 'File upload failed' });
-      } else if (error) {
-        // An error occurred during file upload
-        console.error('Error uploading file:', error);
-        return res.status(500).json({ message: 'File upload failed' });
-      }
+  app.post('/upload', upload.array('images', 5), async (req, res) => {
+    try {
+      const { title, description } = req.body;
+      const { files } = req;
   
-      // No error occurred, file upload was successful
-      if (!req.file) {
-        return res.status(400).json({ message: 'No file uploaded' });
-      }
+      const imageUrls = await Promise.all(
+        files.map(async (file) => {
+          const bucket = storage.bucket();
+          const imageRef = bucket.file(`images/${file.originalname}`);
+          const metadata = { contentType: file.mimetype };
   
-      try {
-        const file = req.file;
-        const filename = file.filename;
-        const filePath = `images/${filename}`;
-        await bucket.upload(file.path, {
-          destination: filePath,
-          metadata: {
-            contentType: file.mimetype,
-          },
-        });
-        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
-        res.json({
-          filename: file.originalname,
-          url: publicUrl,
-        });
-      } catch (error) {
-        console.error('Error uploading file:', error);
-        res.status(500).json({ message: 'Error uploading file' });
-      }
-    });
+          await imageRef.save(file.buffer, { metadata });
+          const [url] = await imageRef.getSignedUrl({ action: 'read', expires: '03-09-2491' });
+  
+          return url;
+        })
+      );
+  
+      const projectData = {
+        title: title,
+        description: description,
+        images: imageUrls,
+      };
+  
+      await firestore.collection('projects').add(projectData);
+  
+      res.status(200).json({ message: 'Upload successful' });
+    } catch (error) {
+      console.error('Error uploading images:', error);
+      res.status(500).json({ message: 'Upload failed' });
+    }
   });
 
 
@@ -260,29 +244,18 @@
       const imagesSnapshot = await projectRef.collection('images').get();
       const images = [];
   
-      // Use Promise.all to wait for all signed URLs to be created
-      await Promise.all(imagesSnapshot.docs.map(async (imageDoc) => {
+      // Construct the response object with direct image URLs
+      imagesSnapshot.docs.forEach((imageDoc) => {
         const imageData = imageDoc.data();
         const { imageUrl, imageTitle, imageDescription } = imageData;
   
-        const fileName = imageUrl.replace('gs://philjaps-prod.appspot.com/', ''); // Replace with your bucket URL
-        const file = bucket.file(fileName);
-  
-        // Create a signed URL for the file
-        const config = {
-          action: 'read',
-          expires: '03-09-2491'
-        };
-        const [url] = await file.getSignedUrl(config);
-        
-        // Use the signed URL instead of the gs:// URL
         images.push({
           id: imageDoc.id,
-          imageUrl: url,
+          imageUrl,
           imageTitle,
           imageDescription,
         });
-      }));
+      });
   
       // Construct the response object
       const projectResponse = {
@@ -298,6 +271,9 @@
       res.status(500).send('Error fetching project images');
     }
   });
+  
+  
+  
   
 
   /* The code below is defining a route for a GET request to retrieve all users from a Firestore

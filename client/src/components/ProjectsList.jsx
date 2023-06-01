@@ -30,19 +30,20 @@ const ProjectsList = ({ userId }) => {
   }, [userId]);
 
   const handleCardClick = (projectId, projectTitle) => {
-    
     navigate(`/projects/${projectId}?userId=${userId}?projectTitle=${projectTitle}`);
   };
 
   if (isLoading) {
     return (
       <div className="flex gap-8 py-2 -z-10 flex-nowrap">
-        {Array(5).fill().map((item, index) => (
-          <div key={index} className="w-64 h-64 m-3 rounded-md">
-            <Skeleton height={100} />
-            <Skeleton height={50} />
-          </div>
-        ))}
+        {Array(5)
+          .fill()
+          .map((item, index) => (
+            <div key={index} className="w-64 h-64 m-3 rounded-md">
+              <Skeleton height={100} />
+              <Skeleton height={50} />
+            </div>
+          ))}
       </div>
     );
   }
@@ -52,7 +53,7 @@ const ProjectsList = ({ userId }) => {
   }
 
   return (
-    <div className="z-40 flex justify-center h-full gap-8 py-2 flex-nowrap">
+    <div className="z-40 flex justify-start h-full gap-8 py-2 flex-wrap">
       {projects.map((project, index) => (
         <CardComponent key={index} project={project} onClick={() => handleCardClick(project.id, project.title)} />
       ))}

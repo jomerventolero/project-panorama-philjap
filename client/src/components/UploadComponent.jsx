@@ -1,119 +1,180 @@
-import React from 'react';
-import axios from 'axios';
-import { useForm, useFieldArray } from 'react-hook-form';
+import React, { useState, useEffect } from 'react';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/storage';
+import 'firebase/compat/firestore';
 
-const UploadComponent = ({ userId }) => {
-  const { register, handleSubmit, control } = useForm({
-    defaultValues: {
-      images: [{ imageTitle: '', imageDescription: '', imageFile: null }],
-    },
-  });
+const UploadComponent = () => {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [images, setImages] = useState([]);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [userId, setUserId] = useState('');
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'images',
-  });
+  useEffect(() => {
+    const user = firebase.auth().currentUser;
+    if (user) {
+      setUserId(user.uid);
+    }
+  }, []);
 
-  const onSubmit = async (data) => {
-    const formData = new FormData();
-    
-    data.images.forEach((img, index) => {
-      formData.append(`images[${index}][title]`, img.imageTitle);
-      formData.append(`images[${index}][description]`, img.imageDescription);
-      if (img.imageFile.length) {
-        formData.append(`images[${index}][file]`, img.imageFile[0]);
-      }
-    });
-    
-    formData.append('uid', userId);
-    formData.append('title', data.title);
-    formData.append('description', data.description);
-    
-    const response = await axios.post('http://localhost:3002/upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    
-    console.log(response.data);
+  const handleTitleChange = (event) => {
+    setTitle(event.target.value);
   };
-  
+
+  const handleDescriptionChange = (event) => {
+    setDescription(event.target.value);
+  };
+
+  const handleImageChange = (event, index) => {
+    const file = event.target.files[0];
+    const newImages = [...images];
+    newImages[index] = {
+      title: '',
+      file: file,
+    };
+    setImages(newImages);
+  };
+
+  const handleTitleInputChange = (event, index) => {
+    const newImages = [...images];
+    newImages[index].title = event.target.value;
+    setImages(newImages);
+  };
+
+  const handleAddImage = () => {
+    const newImages = [...images, { title: '', file: null }];
+    setImages(newImages);
+  };
+
+  const handleRemoveImage = (index) => {
+    const newImages = [...images];
+    newImages.splice(index, 1);
+    setImages(newImages);
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    // Upload images to Firebase Storage
+    const storageRef = firebase.storage().ref();
+    const imageUrls = await Promise.all(
+      images.map(async (image) => {
+        if (image.file) {
+          const imageRef = storageRef.child(`images/${image.file.name}`);
+          await imageRef.put(image.file);
+          return imageRef.getDownloadURL();
+        }
+      })
+    );
+
+    // Save data to Firestore
+    const firestore = firebase.firestore();
+    const projectRef = firestore
+      .collection('projects')
+      .doc(userId)
+      .collection('project')
+      .doc();
+
+    await projectRef.set({
+      title: title,
+      description: description,
+    });
+
+    const imagesCollectionRef = projectRef.collection('images');
+    imageUrls
+      .filter(Boolean)
+      .forEach((imageUrl, index) => imagesCollectionRef.add({
+        title: images[index].title,
+        imageUrl: imageUrl,
+      }));
+
+    // Reset form fields
+    setTitle('');
+    setDescription('');
+    setImages([]);
+    setUploadSuccess(true);
+    setTimeout(() => setUploadSuccess(false), 3000);
+  };
 
   return (
-    <div className="flex items-center justify-center min-h-screen text-white bg-slate-900">
-      <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md p-8 bg-glass">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900">
+      <h2 className="text-3xl text-white mb-4">Upload Component</h2>
+      {uploadSuccess && (
+        <div className="bg-green-500 text-white p-2 mb-4 rounded">
+          Upload successful!
+        </div>
+      )}
+      <form onSubmit={handleSubmit} className="w-96 bg-gray-800 p-6 rounded shadow">
         <div className="mb-4">
-          <label className="block mb-2 text-sm font-bold text-gray-300">
+          <label htmlFor="title" className="text-white text-sm font-bold">
             Project Title:
           </label>
-          <input 
-            type="text" 
-            {...register("title")} 
-            required 
-            className="w-full px-3 py-2 leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+          <input
+            type="text"
+            id="title"
+            value={title}
+            onChange={handleTitleChange}
+            required
+            className="w-full px-3 py-2 text-gray-700 bg-gray-200 rounded"
           />
         </div>
-
         <div className="mb-4">
-          <label className="block mb-2 text-sm font-bold text-gray-300">
+          <label htmlFor="description" className="text-white text-sm font-bold">
             Project Description:
           </label>
-          <input 
-            type="text" 
-            {...register("description")} 
-            required 
-            className="w-full px-3 py-2 leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+          <input
+            type="text"
+            id="description"
+            value={description}
+            onChange={handleDescriptionChange}
+            required
+            className="w-full px-3 py-2 text-gray-700 bg-gray-200 rounded"
           />
         </div>
-
-        {fields.map((item, index) => (
-          <fieldset key={item.id} className="mb-4">
-            <div className="mb-2">
-              <label className="block mb-2 text-sm font-bold text-gray-300">
+        <div className="mb-4">
+          <h3 className="text-white text-lg font-bold mb-2">Images:</h3>
+          {images.map((image, index) => (
+            <div key={index} className="mb-2">
+              <label htmlFor={`imageTitle-${index}`} className="text-white text-sm font-bold">
                 Image Title:
               </label>
-              <input 
-                type="text" 
-                {...register(`images.${index}.imageTitle`)} 
-                required 
-                className="w-full px-3 py-2 leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+              <input
+                type="text"
+                id={`imageTitle-${index}`}
+                value={image.title}
+                onChange={(event) => handleTitleInputChange(event, index)}
+                required
+                className="w-full px-3 py-2 text-gray-700 bg-gray-200 rounded"
               />
-            </div>
-            
-            <div className="mb-2">
-              <label className="block mb-2 text-sm font-bold text-gray-300">
-                Image:
-              </label>
-              <input 
-                type="file" 
-                {...register(`images.${index}.imageFile`)}
-                required 
-                className="w-full px-3 py-2 leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+              <input
+                type="file"
+                onChange={(event) => handleImageChange(event, index)}
+                required
+                className="w-full px-3 py-2 text-gray-700 bg-gray-200 rounded"
               />
+              <button
+                type="button"
+                onClick={() => handleRemoveImage(index)}
+                className="text-red-500 mt-2"
+              >
+                Remove Image
+              </button>
             </div>
-
-            <button type="button" onClick={() => remove(index)} className="text-red-500">
-              Remove Image
-            </button>
-          </fieldset>
-        ))}
-
-        <button 
-          type="button" 
-          onClick={() => append({ imageTitle: '', imageDescription: '', imageFile: null })} 
-          className="text-blue-500"
-        >
-          Add Image
-        </button>
-
-        <div className="flex items-center justify-center mt-4">
-          <button 
-            type="submit"
-            className="w-3/4 px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:shadow-outline"
+          ))}
+          <button
+            type="button"
+            onClick={handleAddImage}
+            className="text-blue-500 mb-2"
           >
-            Upload
+            Add Image
           </button>
         </div>
+        <button
+          type="submit"
+          className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Upload
+        </button>
       </form>
     </div>
   );
