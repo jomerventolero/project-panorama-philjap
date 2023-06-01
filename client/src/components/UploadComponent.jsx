@@ -31,6 +31,8 @@ const UploadComponent = () => {
     newImages[index] = {
       title: '',
       file: file,
+      preview: URL.createObjectURL(file),
+      progress: 0,
     };
     setImages(newImages);
   };
@@ -42,7 +44,7 @@ const UploadComponent = () => {
   };
 
   const handleAddImage = () => {
-    const newImages = [...images, { title: '', file: null }];
+    const newImages = [...images, { title: '', file: null, preview: null, progress: 0 }];
     setImages(newImages);
   };
 
@@ -58,11 +60,22 @@ const UploadComponent = () => {
     // Upload images to Firebase Storage
     const storageRef = firebase.storage().ref();
     const imageUrls = await Promise.all(
-      images.map(async (image) => {
+      images.map(async (image, index) => {
         if (image.file) {
           const imageRef = storageRef.child(`images/${image.file.name}`);
-          await imageRef.put(image.file);
-          return imageRef.getDownloadURL();
+          const uploadTask = imageRef.put(image.file);
+
+          uploadTask.on('state_changed', (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            const newImages = [...images];
+            newImages[index].progress = progress;
+            setImages(newImages);
+          });
+
+          await uploadTask;
+
+          const imageUrl = await imageRef.getDownloadURL();
+          return imageUrl;
         }
       })
     );
@@ -83,10 +96,12 @@ const UploadComponent = () => {
     const imagesCollectionRef = projectRef.collection('images');
     imageUrls
       .filter(Boolean)
-      .forEach((imageUrl, index) => imagesCollectionRef.add({
-        title: images[index].title,
-        imageUrl: imageUrl,
-      }));
+      .forEach((imageUrl, index) =>
+        imagesCollectionRef.add({
+          title: images[index].title,
+          imageUrl: imageUrl,
+        })
+      );
 
     // Reset form fields
     setTitle('');
@@ -97,16 +112,20 @@ const UploadComponent = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900">
+    <div className="flex flex-col items-center justify-center min-h-screen">
       <h2 className="text-3xl text-white mb-4">Upload Component</h2>
       {uploadSuccess && (
-        <div className="bg-green-500 text-white p-2 mb-4 rounded">
-          Upload successful!
-        </div>
+        <div className="bg-green-500 text-white p-2 mb-4 rounded">Upload successful!</div>
       )}
-      <form onSubmit={handleSubmit} className="w-96 bg-gray-800 p-6 rounded shadow">
+      <form
+        onSubmit={handleSubmit}
+        className="w-96 bg-gray-800 p-6 rounded shadow"
+      >
         <div className="mb-4">
-          <label htmlFor="title" className="text-white text-sm font-bold">
+          <label
+            htmlFor="title"
+            className="text-white text-sm font-bold"
+          >
             Project Title:
           </label>
           <input
@@ -119,7 +138,10 @@ const UploadComponent = () => {
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="description" className="text-white text-sm font-bold">
+          <label
+            htmlFor="description"
+            className="text-white text-sm font-bold"
+          >
             Project Description:
           </label>
           <input
@@ -135,7 +157,10 @@ const UploadComponent = () => {
           <h3 className="text-white text-lg font-bold mb-2">Images:</h3>
           {images.map((image, index) => (
             <div key={index} className="mb-2">
-              <label htmlFor={`imageTitle-${index}`} className="text-white text-sm font-bold">
+              <label
+                htmlFor={`imageTitle-${index}`}
+                className="text-white text-sm font-bold"
+              >
                 Image Title:
               </label>
               <input
@@ -152,6 +177,21 @@ const UploadComponent = () => {
                 required
                 className="w-full px-3 py-2 text-gray-700 bg-gray-200 rounded"
               />
+              {image.preview && (
+                <img
+                  src={image.preview}
+                  alt="Preview"
+                  className="w-full mt-2 rounded"
+                />
+              )}
+              {image.progress > 0 && image.progress < 100 && (
+                <div className="bg-blue-500 h-2 mt-2 rounded">
+                  <div
+                    className="bg-white h-full"
+                    style={{ width: `${image.progress}%` }}
+                  ></div>
+                </div>
+              )}
               <button
                 type="button"
                 onClick={() => handleRemoveImage(index)}
