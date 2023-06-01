@@ -18,8 +18,7 @@ const UploadComponent = ({ userId }) => {
 
   const onSubmit = async (data) => {
     try {
-      const userRef = firestore.collection('projects').doc(userId);
-      const projectRef = userRef.collection('project').doc();
+      const projectRef = firestore.collection('projects').doc(userId).collection('project').doc();
       const batch = firestore.batch();
 
       const project = {
@@ -34,7 +33,7 @@ const UploadComponent = ({ userId }) => {
         const file = img.imageFile && img.imageFile[0];
         if (file) {
           await uploadToWebDAV(file, imageRef.id);
-          const imageUrl = `https://bespokefilesharing.ddns.net/home/Downloads/${imageRef.id}`; // Replace with your NAS WebDAV image URL
+          const imageUrl = `http://your-nas-ip/path/to/uploads/${imageRef.id}`; // Replace with your NAS WebDAV image URL
           const image = {
             imageTitle: img.imageTitle,
             imageUrl: imageUrl,
@@ -61,8 +60,9 @@ const UploadComponent = ({ userId }) => {
   };
 
   const uploadToWebDAV = async (file, filename) => {
-    const webdavUrl = 'https://bespokefilesharing.ddns.net/home/Downloads'; 
-    const credentials = 'it-admin:#Bespoke123@'; 
+    const webdavUrl = 'http://your-nas-ip/webdav/path/to/uploads'; // Replace with your NAS WebDAV upload folder URL
+    const credentials = 'username:password'; // Replace with your WebDAV credentials
+
     const formData = new FormData();
     formData.append('file', file);
 
