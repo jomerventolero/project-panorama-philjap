@@ -5,7 +5,6 @@
    const cors = require('cors');
    const admin = require('firebase-admin');
    const serviceAccount = require('./firebase-config/philjaps-prod-firebase-adminsdk-g5s8r-1610e21e1c.json');
-   const bodyParser = require('body-parser');
    const uuid = require('uuid');
 
 
@@ -32,10 +31,10 @@
   time, and the original file extension. */
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, './uploads'); // Specify the directory where uploaded files will be stored
+      cb(null, './uploads');
     },
     filename: function (req, file, cb) {
-      cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname)); // Set the filename for the uploaded file
+      cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname)); // Use 'path.extname' to get the file extension
     },
   });
    
@@ -79,20 +78,17 @@
     }
   };
    
-  // Set up multer middleware
   const upload = multer({
     storage: storage,
-    limits: { fileSize: 15 * 1024 * 1024 }, // Limit the file size to 15MB
+    limits: { fileSize: 15 * 1024 * 1024 },
     fileFilter: function (req, file, cb) {
-      // Validate the file type if needed
-      // For example, to only allow image files, you can check the MIME type or file extension
       if (file.mimetype.startsWith('image/')) {
-        cb(null, true); // Accept the file
+        cb(null, true);
       } else {
-        cb(new Error('Invalid file type. Only image files are allowed.')); // Reject the file
+        cb(new Error('Invalid file type. Only image files are allowed.'));
       }
     },
-  });
+  }).single('image'); 
   
 
   /* The code below is defining a route for the "/user" endpoint in an Express app. The route is
@@ -181,39 +177,43 @@
   });
 
 
-  // Route for handling file uploads
-  app.post('/upload', upload.single('image'), async (req, res) => {
-    try {
-      // Access the uploaded file using req.file
-      const file = req.file;
-
-      // Check if a file was uploaded
-      if (!file) {
+  app.post('/upload', (req, res) => {
+    upload(req, res, async (error) => {
+      if (error instanceof multer.MulterError) {
+        // A Multer error occurred during file upload
+        console.error('Multer error:', error);
+        return res.status(500).json({ message: 'File upload failed' });
+      } else if (error) {
+        // An error occurred during file upload
+        console.error('Error uploading file:', error);
+        return res.status(500).json({ message: 'File upload failed' });
+      }
+  
+      // No error occurred, file upload was successful
+      if (!req.file) {
         return res.status(400).json({ message: 'No file uploaded' });
       }
-
-      // Upload the file to Firebase Storage
-      const filename = file.filename;
-      const filePath = `images/${filename}`;
-      await bucket.upload(file.path, {
-        destination: filePath,
-        metadata: {
-          contentType: file.mimetype,
-        },
-      });
-
-      // Construct the public URL for the uploaded file
-      const publicUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
-
-      // Respond with the file information
-      res.json({
-        filename: file.originalname,
-        url: publicUrl,
-      });
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      res.status(500).json({ message: 'Error uploading file' });
-    }
+  
+      try {
+        const file = req.file;
+        const filename = file.filename;
+        const filePath = `images/${filename}`;
+        await bucket.upload(file.path, {
+          destination: filePath,
+          metadata: {
+            contentType: file.mimetype,
+          },
+        });
+        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
+        res.json({
+          filename: file.originalname,
+          url: publicUrl,
+        });
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        res.status(500).json({ message: 'Error uploading file' });
+      }
+    });
   });
 
 

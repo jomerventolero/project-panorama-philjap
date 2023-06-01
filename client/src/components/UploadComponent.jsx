@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useForm, useFieldArray } from 'react-hook-form';
+import { firestore, app, storage } from '../firebase/auth'; // Import your Firebase app, Firestore, and Storage instances
 
 const UploadComponent = ({ userId }) => {
   const { register, handleSubmit, control } = useForm({
@@ -15,36 +15,53 @@ const UploadComponent = ({ userId }) => {
   });
 
   const [formFields, setFormFields] = useState(fields);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
 
   const onSubmit = async (data) => {
-    const formData = new FormData();
-  
-    data.images.forEach((img, index) => {
-      formData.append(`images[${index}][title]`, img.imageTitle);
-      formData.append(`images[${index}][description]`, img.imageDescription);
-      if (img.imageFile && img.imageFile[0]) {
-        formData.append(`images[${index}][file]`, img.imageFile[0]);
-      }
-    });
-  
-    formData.append('uid', userId);
-    formData.append('title', data.title);
-    formData.append('description', data.description);
-  
-    const response = await axios.post('http://localhost:3002/upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-  
-    console.log(response.data);
+    try {
+      const userRef = firestore.collection('projects').doc(userId);
+      const projectRef = userRef.collection('project').doc();
+      const batch = firestore.batch();
+
+      const promises = data.images.map(async (img, index) => {
+        const imageRef = projectRef.collection('images').doc();
+        const file = img.imageFile && img.imageFile[0];
+        if (file) {
+          const fileRef = storage.ref().child(`images/${imageRef.id}`);
+          await fileRef.put(file);
+          const imageUrl = await fileRef.getDownloadURL();
+
+          const image = {
+            imageTitle: img.imageTitle,
+            imageUrl: imageUrl,
+          };
+
+          batch.set(imageRef, image);
+        }
+      });
+
+      await Promise.all(promises);
+
+      const project = {
+        title: data.title,
+        description: data.description,
+      };
+
+      batch.set(projectRef, project);
+
+      await batch.commit();
+
+      setUploadSuccess(true);
+      console.log('Upload successful!');
+    } catch (error) {
+      console.error('Error uploading data:', error);
+    }
   };
-  
 
   const handleFileChange = (e, index) => {
     const file = e.target.files[0];
     const updatedFields = [...formFields];
-    updatedFields[index].imageFile = file;
+    updatedFields[index].imageFile = [file];
     setFormFields(updatedFields);
   };
 
@@ -123,6 +140,12 @@ const UploadComponent = ({ userId }) => {
             Upload
           </button>
         </div>
+
+        {uploadSuccess && (
+          <div className="mt-4 text-green-500">
+            Upload successful!
+          </div>
+        )}
       </form>
     </div>
   );
