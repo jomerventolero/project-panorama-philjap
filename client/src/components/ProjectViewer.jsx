@@ -1,5 +1,4 @@
-import React from 'react';
-import { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import CardIndvComp from './CardIndvComp';
@@ -69,6 +68,19 @@ const ProjectViewer = () => {
     }
   };
 
+  const handleDeleteProject = async () => {
+    try {
+      // Delete the project document
+      const userRef = firestore.collection('projects').doc(userId);
+      const projectRef = userRef.collection('project').doc(projectId);
+      await projectRef.delete();
+
+      // Redirect to a different page or perform any necessary action
+    } catch (error) {
+      console.error('Error deleting project:', error);
+    }
+  };
+
   // Check if userIdFromUrl exists before rendering the component
   if (!userId) {
     return <div>Loading...</div>;
@@ -107,6 +119,15 @@ const ProjectViewer = () => {
           ))}
         </div>
       </div>
+
+      {isAdmin && (
+        <button
+          onClick={handleDeleteProject}
+          className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Delete Project
+        </button>
+      )}
     </div>
   );
 };

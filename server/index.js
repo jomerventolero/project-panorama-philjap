@@ -352,18 +352,102 @@
     }
   });
 
+  app.post('/register', async (req, res) => {
+    const { firstName, lastName, bday, email, password, isAdmin } = req.body;
+    try {
+      // Create a new user
+      const userRecord = await auth.createUser({
+        email: email,
+        password: password,
+      });
+  
+      // Save the user's profile information in Firestore
+      await db.collection('users').doc(userRecord.uid).set({
+        firstName: firstName,
+        lastName: lastName,
+        birthday: bday,
+        isAdmin: isAdmin,
+        email: email,
+      });
+  
+      if (isAdmin) {
+        // Create a dedicated folder for the admin user in Firebase Storage
+        const bucketName = 'philjaps.appspot.com'; // Replace with your storage bucket name
+        const bucket = admin.storage().bucket(bucketName);
+        const folderPath = `admin/${userRecord.uid}/`;
+        await bucket.file(folderPath).save('');
+  
+        // Set custom Firebase Storage rules for the admin folder
+        await bucket.file('.settings/rules.json').save(
+          JSON.stringify({
+            rules: {
+              rulesVersion: '2',
+              firebaseStoragePath: {
+                '.write': `root.child('${folderPath}').child(newData.path).child('metadata/admin').val() === true`,
+                '.read': `root.child('${folderPath}').child(data.path).child('metadata/admin').val() === true`,
+              },
+            },
+          })
+        );
+          
+        // Grant admin privileges to the user
+        await admin.auth().setCustomUserClaims(userRecord.uid, { admin: true });
+      }
+  
+      res.send({ message: 'User registered successfully', userId: userRecord.uid });
+    } catch (error) {
+      console.error('Error creating new user:', error);
+      res.status(500).send({ message: 'Error creating new user' });
+    }
+  });
+
+  app.post('/uploadProfileImage/:userId', upload.single('profileImage'), async (req, res) => {
+    const { userId } = req.params;
+  
+    try {
+      const file = req.file;
+  
+      if (!file) {
+        return res.status(400).json({ error: 'No profile image provided' });
+      }
+  
+      const bucketName = 'philjaps.appspot.com'; // Replace with your storage bucket name
+      const bucket = admin.storage().bucket(bucketName);
+      const filePath = `profiles/${userId}/${file.originalname}`;
+      const fileRef = bucket.file(filePath);
+  
+      await fileRef.save(file.buffer, {
+        metadata: {
+          contentType: file.mimetype,
+        },
+      });
+  
+      const downloadUrl = `gs://${bucketName}/${filePath}`;
+  
+      await db.collection('users').doc(userId).update({
+        profileUrl: downloadUrl,
+      });
+  
+      res.status(200).json({ message: 'Profile image uploaded successfully', downloadUrl });
+    } catch (error) {
+      console.error('Error uploading profile image:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+  
+
   app.get('/getProfile/:userId', async (req, res) => {
     const userId = req.params.userId;
   
     try {
       const userDoc = await db.collection('users').doc(userId).get();
-        
+  
       if (!userDoc.exists) {
         throw new Error('User not found');
       }
-        
+  
       const userData = userDoc.data();
-        
+  
       return res.json({
         profileUrl: userData.profileUrl,
       });

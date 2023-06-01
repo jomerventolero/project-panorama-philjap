@@ -11,6 +11,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import ProjectViewer from './components/ProjectViewer';
 import ClientProjectView from './components/ClientProjectView';
 import ClientDashboardPage from './pages/ClientDashboardPage';
+import ProfileEdit from './pages/ProfileEdit';
+
 import './index.css'
 
 
@@ -28,6 +30,7 @@ root.render(
         <Route path="/dashboard-admin" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/dashboard-user" element={<ProtectedRoute><ClientDashboardPage /></ProtectedRoute>} />
         <Route path="/upload" element={<ProtectedRoute><UploadPage /></ProtectedRoute>} />
+        <Route path="/profile-edit" element={<ProtectedRoute><ProfileEdit /></ProtectedRoute>} />
         <Route path="/projects/:projectId" element={<ProjectViewer />} />
         <Route path="/profile/:userId" element={<ClientProjectView />} />
       </Routes>
