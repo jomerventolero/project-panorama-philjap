@@ -87,13 +87,7 @@ const Menu = ({ logout }) => {
 
       {isOpen && (
         <div className="absolute right-0 items-center w-40 mt-4 rounded-lg shadow-xl bg-glass">
-          <a
-            className="flex items-center justify-start px-2 py-1 text-xl text-white cursor-pointer hover:bg-gray-400 hover:rounded-xl hover:text-blue-500"
-            href="/profile-edit"
-          >
-            <ImProfile className="inline-block w-6 h-6 mr-2 align-text-top" />
-            <span>Profile</span>
-          </a>
+
           <a href={user.isAdmin ? "/dashboard-user" : "/dashboard-admin"} className="flex items-center justify-start px-2 py-1 text-xl text-white hover:bg-gray-400 hover:rounded-xl hover:text-blue-500">
             <FaTruckLoading className="inline-block w-6 h-6 mr-2 align-text-top" />
             <span>Reload</span>
