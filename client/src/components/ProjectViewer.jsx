@@ -30,7 +30,7 @@ const ProjectViewer = () => {
         const userDoc = await firestore.collection('users').doc(userIdFromUrl).get();
         const userData = userDoc.data();
         if (userData && userData.isAdmin) {
-          setIsAdmin(true);
+          setIsAdmin(false);
         }
 
         if (userIdFromUrl) {

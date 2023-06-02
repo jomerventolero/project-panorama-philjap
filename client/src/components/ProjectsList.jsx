@@ -11,22 +11,22 @@ const ProjectsList = ({ userId }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (userId !== null) {
+    if (userId !== null) {
+      const fetchData = async () => {
         try {
           const response = await axios.get(`http://localhost:3002/api/projects/${userId}`);
           setProjects(response.data);
           setIsLoading(false);
         } catch (error) {
-          setError(" No Projects Found");
+          setError("No Projects Found");
           setIsLoading(false);
         }
-      } else {
-        setIsLoading(false);
-      }
-    };
+      };
 
-    fetchData();
+      fetchData();
+    } else {
+      setIsLoading(false);
+    }
   }, [userId]);
 
   const handleCardClick = (projectId, projectTitle) => {
