@@ -95,13 +95,13 @@ const ProjectViewer = () => {
       </div>
       <div className="flex flex-row relative justify-center items-center h-full w-[90%] px-2 pt-[50px] mx-auto">
         <button
-          className="absolute left-0 top-1/2 text-[32px] transform -translate-y-1/2 z-20 bg-white p-2 rounded-r-md shadow"
+          className="absolute font-bold bg-glassNav left-0 top-1/2 text-[48px] transform -translate-y-1/2 z-20 bg-white p-2 rounded-md shadow"
           onClick={handleScrollLeft}
         >
           &lt;
         </button>
         <button
-          className="absolute right-0 top-1/2 text-[32px] transform -translate-y-1/2 z-20 bg-white p-2 rounded-l-md shadow"
+          className="absolute font-bold bg-glassNav right-0 top-1/2 text-[48px] transform -translate-y-1/2 z-20 bg-white p-2 rounded-md shadow"
           onClick={handleScrollRight}
         >
           &gt;
