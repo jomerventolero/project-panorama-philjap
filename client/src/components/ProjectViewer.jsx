@@ -88,7 +88,7 @@ const ProjectViewer = () => {
 
   return (
     <div className="h-[500px]">
-      {isAdmin ? <ClientNavbar /> : <Navbar />}
+      {isAdmin ? <Navbar /> : <ClientNavbar />}
       <div className="pt-[150px] flex flex-col justify-center items-center">
         <h1 className="text-xl font-bold text-white">{projectTitle}</h1>
         {selectedImage && <PanoramaViewer image={selectedImage} />}
