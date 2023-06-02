@@ -93,7 +93,7 @@ const ProjectViewer = () => {
         <h1 className="text-xl font-bold text-white">{projectTitle}</h1>
         {selectedImage && <PanoramaViewer image={selectedImage} />}
       </div>
-      <div className="flex flex-row relative justify-center items-center h-full w-full px-2 pt-[50px] bg-slate-900">
+      <div className="flex flex-row relative justify-center items-center h-full w-3/4 px-2 pt-[50px] mx-auto">
         <button
           className="absolute left-0 top-1/2 text-[32px] transform -translate-y-1/2 z-20 bg-white p-2 rounded-r-md shadow"
           onClick={handleScrollLeft}
@@ -108,7 +108,7 @@ const ProjectViewer = () => {
         </button>
 
         <div
-          className="z-10 flex flex-row justify-between overflow-y-hidden gap-36 scrollbar-thin"
+          className="z-10 flex flex-row justify-between overflow-y-hidden gap-20 scrollbar-thin"
           ref={imageContainerRef}
           style={{ scrollbarWidth: 'none' }}
         >

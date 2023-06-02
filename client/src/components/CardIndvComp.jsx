@@ -3,7 +3,7 @@ import Skeleton from 'react-loading-skeleton';
 
 const CardIndvComp = ({ image, onClick }) => {
   return (
-    <div className="h-auto mx-auto font-sans shadow-md cursor-pointer w-96 card-component bg-glass rounded-xl" onClick={onClick}>
+    <div className="h-auto mx-auto font-sans shadow-md cursor-pointer w-96 card-component bg-gray-900 rounded-xl" onClick={onClick}>
       {image ? (
         <div className="px-4 pt-2 pb-4">
           <img className="object-cover w-full h-48 mb-2 rounded-xl" src={image.imageUrl} alt={image.imageTitle} />

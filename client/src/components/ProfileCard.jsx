@@ -28,17 +28,17 @@ const ProfileCard = ({ user, onUserClick }) => {
   };
 
   return (
-      <div className="max-w-xl px-4 mx-auto overflow-hidden rounded-2xl shadow-lg hover:bg-gray-600 bg-slate-400">
-        <div className="px-4 py-2">
-          <img src={profileUrl} alt="Profile" className="w-32 h-32 mx-auto rounded-full" />
-          <h2 className="mt-4 text-2xl font-bold text-center text-white">Engr. {user ? user.firstName : ''}</h2>
-          <p className="text-center text-gray-400"> {user ? user.lastName : ''}</p>
-        </div>
-        <div className="flex flex-col justify-center p-2 items-center">
-          <p className="mt-2 text-blue-500">{user ? user.email : ''}</p>
-          <button className="px-4 py-2 my-4 bg-glass hover:bg-sky-500 rounded-full text-slate-200" onClick={onUserClick}>Goto {user.firstName} Profile</button>
-        </div>
-      </div>
+    <div className="max-w-xl px-20 py-4 mx-auto overflow-hidden rounded-2xl shadow-lg hover:bg-gray-600 bg-gray-900">
+    <div className="px-4 py-2">
+      <img src={profileUrl} alt="Profile" className="w-32 h-32 mx-auto rounded-full" />
+      <h2 className="mt-4 text-2xl font-bold text-center text-sky-400">Engr. {user ? user.firstName : ''}</h2>
+      <p className="text-center text-gray-400"> {user ? user.lastName : ''}</p>
+    </div>
+    <div className="flex flex-col justify-center p-2 items-center">
+      <p className=" text-white mb-2">{user ? user.email : ''}</p>
+      <button className="p-1 bg-sky-600 rounded-full text-white mb-2 px-5 py-2" onClick={onUserClick}>Go to {user.firstName}'s Profile</button>
+    </div>
+  </div>
   );
 };
 

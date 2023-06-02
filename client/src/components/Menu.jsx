@@ -80,7 +80,7 @@ const Menu = ({ logout }) => {
           <img
             src={default_profile_img}
             alt="default-profile"
-            className="w-[48px] rounded-full z-10"
+            className="w-[38px] mt-2 rounded-full z-10"
           />
         )}
       </button>
@@ -88,7 +88,7 @@ const Menu = ({ logout }) => {
       {isOpen && (
         <div className="absolute right-0 items-center w-40 mt-4 rounded-lg shadow-xl bg-glass">
 
-          <a href={user && user.isAdmin ? "/dashboard-admin" : "/dashboard-user"} className="flex items-center justify-start px-2 py-1 text-xl text-white hover:bg-gray-400 hover:rounded-xl hover:text-blue-500">
+          <a href={user.isAdmin ? "/dashboard-admin" : "/dashboard-user"} className="flex items-center justify-start px-2 py-1 text-xl text-white hover:bg-gray-400 hover:rounded-xl hover:text-blue-500">
             <FaTruckLoading className="inline-block w-6 h-6 mr-2 align-text-top" />
             <span>Reload</span>
           </a>

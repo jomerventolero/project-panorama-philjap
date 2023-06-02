@@ -81,7 +81,7 @@ const EmailForm = ({ userId }) => {
   };
 
   return (
-    <div className="max-w-md p-6 mx-auto text-white bg-gray-900 rounded-lg shadow-lg">
+    <div className="max-w-md p-6 mx-auto w-3/4 text-white bg-gray-900 rounded-lg shadow-lg">
       <h2 className="mb-4 text-2xl font-bold">Send Email</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">

@@ -119,7 +119,7 @@ const UploadComponent = () => {
       )}
       <form
         onSubmit={handleSubmit}
-        className="w-96 bg-gray-800 p-6 rounded shadow"
+        className="w-96 bg-gray-900 p-6 rounded shadow"
       >
         <div className="mb-4">
           <label

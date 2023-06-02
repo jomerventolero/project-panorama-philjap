@@ -11,7 +11,7 @@ const ContactUsPage = () => {
   return (
     <div className="flex items-center justify-center">
       <ClientNavbar />
-      <div className="flex flex-col items-center justify-center max-h-screen pt-28">
+      <div className="flex flex-col items-center w-3/4 justify-center max-h-screen pt-28">
         <EmailForm userId={userId} />
       </div>
     </div>

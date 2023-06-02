@@ -56,24 +56,24 @@ const Navbar = () => {
 
 
   return (
-    <div className="fixed top-0 z-50 flex flex-row justify-between w-full gap-2 px-2 py-2 bg-glassNav">
+    <div className="fixed top-0 z-50 flex flex-row justify-between w-full gap-2 px-2 py-2 bg-gray-900">
       <div className="flex flex-row gap-4">
         <a className="" href="/dashboard-admin">
-          <img src={logo} alt="Philjap Logo" className="w-[78px]"/>
+          <img src={logo} alt="Philjap Logo" className="w-[82px] ml-4"/>
         </a>
       </div>
       <a href="/dashboard-admin" className="self-center mx-auto">
-          <span className='px-8 pt-4 font-medium text-white align-middle'>Engr. {firstName}</span>
+          <span className='pt-3 font-medium text-white align-middle'>Engr. {firstName}</span>
       </a>
       <div className="flex flex-row gap-4 font-medium">
         <a href="/upload">
           <img src={upload} alt="upload" className="w-[48px] pt-1 self-center align-middle"/>
         </a>
-        
         {user ? 
           ( <Menu logout={logout} /> ) : 
           ( null )
         }
+        
       </div>
     </div>
   )

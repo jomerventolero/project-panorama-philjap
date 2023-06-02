@@ -56,22 +56,23 @@ const ClientNavbar = () => {
 
 
   return (
-    <div className="fixed top-0 z-50 flex flex-row justify-between w-full gap-2 px-2 py-2 bg-glassNav">
-      <div className="flex flex-row gap-4">
-        <a className="" href="/dashboard-admin">
-          <img src={logo} alt="Philjap Logo" className="w-[78px]"/>
-        </a>
-      </div>
-      <a href="/dashboard-user" className="self-center mx-auto">
-          <span className='px-8 pt-4 font-medium text-white align-middle'>Hello {firstName} 👋</span>
+    <div className="fixed top-0 z-50 flex flex-row justify-between w-full gap-2 px-2 py-2 bg-gray-900">
+    <div className="flex flex-row gap-4">
+      <a className="" href="/dashboard-user">
+        <img src={logo} alt="Philjap Logo" className="w-[82px] ml-3"/>
       </a>
-      <div className="flex flex-row gap-4 font-medium">       
-        {user ? 
-          ( <Menu logout={logout} /> ) : 
-          ( null )
-        }
-      </div>
     </div>
+    <div className="flex flex-row gap-4 font-medium">  
+    <a href="/dashboard-user" className="self-center mx-auto">
+        <span className=' pt-4 font-medium text-white align-middle'>Hello {firstName} 👋</span>
+    </a>     
+      {user ? 
+        ( <Menu logout={logout} /> ) : 
+        ( null )
+      }
+      
+    </div>
+  </div>
   )
 }
 

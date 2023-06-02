@@ -86,7 +86,7 @@ const ClientProjectView = () => {
     <div className="flex flex-col items-center justify-center">
       <ClientNavbar />
       <div className="flex flex-col items-center justify-center">
-        <h1 className="pt-20 text-2xl font-bold text-blue-300">Engr. {firstName}</h1>
+        <h1 className="pt-32 text-2xl font-bold text-blue-300">Engr. {firstName}</h1>
         <span className="font-normal text-white">Projects Directory 📁</span>
       </div>
       <button className="px-4 py-2 mt-6 font-medium text-white border-2 border-blue-400 rounded-full" onClick={handleContact}>Contact {firstName} 📨</button>
