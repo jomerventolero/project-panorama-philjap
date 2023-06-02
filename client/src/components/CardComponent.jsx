@@ -27,10 +27,10 @@ const CardComponent = ({ project, onClick }) => {
       <div className="md:flex-shrink-0">
         {isLoading ? <Skeleton height={200} /> : <img className="object-cover w-3/4 h-64 m-auto rounded-xl md:w-80" src={imageURL} alt={project.title} />}
       </div>
-      <div className="p-8">
+      <div className="flex flex-col items-center justify-center p-8">
         <div className="font-bold tracking-wide text-sky-400 uppercase text-lg">{project.title}</div>
-        <p className="mt-2 text-sm text-left text-white">{project.description}</p>
-        <button className="p-2 m-2 bg-cyan-600 w-1/2 rounded-full text-white ml-16" onClick={onClick}>Open</button>
+        <p className="mt-2 text-sm text-center text-white">{project.description}</p>
+        <button className="p-2 m-2 bg-cyan-600 w-1/2 rounded-full text-white" onClick={onClick}>Open</button>
       </div>
     </div>
   </div>

@@ -32,7 +32,7 @@ const Explorer = () => {
   };
 
   return (
-    <div className="flex flex-col-reverse items-center justify-center gap-8 p-8">
+    <div className="flex flex-col items-center justify-center gap-8 p-8">
       <h1 className="items-center font-medium text-dimWhite">Explore our Engineers Portfolio</h1>
       <div className="grid grid-cols-3 gap-4">
         {adminUsers.map((user) => (
