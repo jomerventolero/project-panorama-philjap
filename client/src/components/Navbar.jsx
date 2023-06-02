@@ -73,7 +73,6 @@ const Navbar = () => {
           ( <Menu logout={logout} /> ) : 
           ( null )
         }
-        
       </div>
     </div>
   )

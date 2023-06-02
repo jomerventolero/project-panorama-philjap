@@ -113,7 +113,7 @@ const ProjectViewer = () => {
           style={{ scrollbarWidth: 'none' }}
         >
           {images.map((image, index) => (
-            <div className={`w-1/4 hover:z-10 ${selectedImage === image.imageUrl ? '' : ''}`} key={index}>
+            <div className={`w-1/4 hover:z-10 ${selectedImage === image.imageUrl}`} key={index}>
               <CardIndvComp image={image} onClick={() => handleCardClick(image.imageUrl)} />
             </div>
           ))}
