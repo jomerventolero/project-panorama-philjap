@@ -90,7 +90,7 @@ const ClientProjectView = () => {
         <span className="font-normal text-white">Projects Directory 📁</span>
       </div>
       <button className="px-4 py-2 mt-6 font-medium text-white border-2 border-blue-400 rounded-full" onClick={handleContact}>Contact {firstName} 📨</button>
-      <div className="z-40 flex justify-center h-full gap-8 py-2 pt-20 flex-nowrap">
+      <div className="z-40 flex justify-center h-full gap-8 py-2 pt-10 flex-nowrap">
         {projects.map((project, index) => (
           <CardComponent
             key={index}

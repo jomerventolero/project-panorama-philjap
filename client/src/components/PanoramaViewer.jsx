@@ -6,6 +6,7 @@ import Loader from './Loader';
 const PanoramaViewer = ({ image }) => {
   const containerRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     let camera, scene, renderer, controls;
@@ -46,7 +47,7 @@ const PanoramaViewer = ({ image }) => {
 
       // Create a new WebGL renderer object
       renderer = new THREE.WebGLRenderer();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setSize(window.innerWidth * (isFullscreen ? 1 : 0.8), window.innerHeight * (isFullscreen ? 1 : 0.8)); // Set the canvas size to 100% or 80% of the window size
 
       // Append the renderer to the container
       containerRef.current.appendChild(renderer.domElement);
@@ -68,7 +69,7 @@ const PanoramaViewer = ({ image }) => {
     const handleResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setSize(window.innerWidth * (isFullscreen ? 1 : 0.8), window.innerHeight * (isFullscreen ? 1 : 0.8)); // Update the canvas size to 100% or 80% of the new window size
     };
 
     window.addEventListener('resize', handleResize);
@@ -81,29 +82,64 @@ const PanoramaViewer = ({ image }) => {
       }
       renderer.dispose();
     };
-  }, [image]);
+  }, [image, isFullscreen]);
 
   const handleFullScreen = () => {
-    if (containerRef.current) {
-      if (containerRef.current.requestFullscreen) {
-        containerRef.current.requestFullscreen();
-      } else if (containerRef.current.mozRequestFullScreen) {
-        containerRef.current.mozRequestFullScreen();
-      } else if (containerRef.current.webkitRequestFullscreen) {
-        containerRef.current.webkitRequestFullscreen();
-      } else if (containerRef.current.msRequestFullscreen) {
-        containerRef.current.msRequestFullscreen();
+    if (!isFullscreen) {
+      if (containerRef.current) {
+        if (containerRef.current.requestFullscreen) {
+          containerRef.current.requestFullscreen();
+        } else if (containerRef.current.mozRequestFullScreen) {
+          containerRef.current.mozRequestFullScreen();
+        } else if (containerRef.current.webkitRequestFullscreen) {
+          containerRef.current.webkitRequestFullscreen();
+        } else if (containerRef.current.msRequestFullscreen) {
+          containerRef.current.msRequestFullscreen();
+        }
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
       }
     }
   };
 
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement ? true : false);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('msfullscreenchange', handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('msfullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
   return (
     <div>
-      <div ref={containerRef} className="rounded-xl" style={{ width: '100%', height: 'calc(100vh - 100px)' }}>
+      <div ref={containerRef} className="rounded-xl" style={{ width: '80%', height: 'calc(80vh - 100px)' }}>
         {isLoading && <Loader />}
       </div>
-      <button onClick={handleFullScreen}
-       className="ml-10 mb-10 rounded-xl p-4 text-white bg-slate-500 border-2 hover:bg-sky-500 font-medium">Fullscreen</button>
+      <button
+        onClick={handleFullScreen}
+        className="ml-5 mb-5 rounded-xl p-4 text-white bg-slate-500 border-2 hover:bg-sky-500 font-medium"
+        style={{ width: '10%' }} // Set the button width to 100% for fullscreen
+      >
+        {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+      </button>
     </div>
   );
 };

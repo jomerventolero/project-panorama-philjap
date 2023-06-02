@@ -53,7 +53,7 @@ const ProjectsList = ({ userId }) => {
   }
 
   return (
-    <div className="z-40 flex justify-start h-full gap-8 py-2 flex-wrap">
+    <div className="z-40 flex justify-start h-full gap-10 py-2 flex-wrap">
       {projects.map((project, index) => (
         <CardComponent key={index} project={project} onClick={() => handleCardClick(project.id, project.title)} />
       ))}
